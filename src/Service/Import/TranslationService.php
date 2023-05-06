@@ -60,15 +60,15 @@ class TranslationService
     /**
      * @param $row
      * @param $array
-     * @param $choosenLanguage
+     * @param $chosenLanguage
      * @return bool
      */
-    public function rowValueEqualsValueInArray($row, $array, $choosenLanguage): bool
+    public function rowValueEqualsValueInArray($row, $array, $chosenLanguage): bool
     {
         if (!empty($array[$this->buildKeyForArray($row)]['text'])) {
-            if (isset($array[$this->buildKeyForArray($row)]['text'][$choosenLanguage])) {
+            if (isset($array[$this->buildKeyForArray($row)]['text'][$chosenLanguage])) {
                 return $this->rowExistsInArray($row,
-                        $array) && (string)$row[$choosenLanguage] === (string)$array[$this->buildKeyForArray($row)]['text'][$choosenLanguage];
+                        $array) && (string)$row[$chosenLanguage] === (string)$array[$this->buildKeyForArray($row)]['text'][$chosenLanguage];
             } else {
                 return false;
             }

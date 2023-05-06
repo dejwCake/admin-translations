@@ -18,7 +18,7 @@ class AdminTranslationsServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         $this->commands([
             ScanAndSave::class,
@@ -47,7 +47,7 @@ class AdminTranslationsServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/admin-translations.php', 'admin-translations');
 

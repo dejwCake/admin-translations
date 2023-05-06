@@ -26,7 +26,7 @@ class ScanAndSave extends Command
      */
     protected $description = 'Scans all PHP files, extract translations and stores them into the database';
 
-    protected function getArguments()
+    protected function getArguments(): array
     {
         return [
             ['paths', InputArgument::IS_ARRAY, 'Array of paths to scan.', (array) config('admin-translations.scanned_directories')],
@@ -36,9 +36,9 @@ class ScanAndSave extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $scanner = app(TranslationsScanner::class);
         collect($this->argument('paths'))->each(function ($path) use ($scanner) {

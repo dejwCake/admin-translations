@@ -11,7 +11,7 @@ class TranslationServiceProvider extends IlluminateTranslationServiceProvider
      * `TranslationLoaderManager` instead of a simple `FileLoader` as the
      * applications `translation.loader` instance.
      */
-    protected function registerLoader()
+    protected function registerLoader(): void
     {
         $this->app->singleton('translation.loader', function ($app) {
             $class = config('admin-translations.translation_manager');

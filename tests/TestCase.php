@@ -9,9 +9,11 @@ use Brackets\AdminTranslations\Translation;
 use Brackets\Translatable\TranslatableServiceProvider;
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
@@ -27,9 +29,18 @@ abstract class TestCase extends Orchestra
 
         Artisan::call('migrate');
 
-        include_once __DIR__.'/../database/migrations/create_translations_table.php.stub';
-
-        (new \CreateTranslationsTable())->up();
+        Schema::create('translations', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('namespace')->default('*');
+            $table->index('namespace');
+            $table->string('group');
+            $table->index('group');
+            $table->text('key');
+            $table->jsonb('text');
+            $table->jsonb('metadata')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
 
         $this->languageLine = $this->createTranslation('*', 'group', 'key', ['en' => 'english', 'nl' => 'nederlands']);
 
@@ -37,11 +48,11 @@ abstract class TestCase extends Orchestra
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      *
      * @return array
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             TranslatableServiceProvider::class,
@@ -50,7 +61,7 @@ abstract class TestCase extends Orchestra
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      */
     protected function getEnvironmentSetUp($app)
     {

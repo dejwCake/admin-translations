@@ -29,7 +29,7 @@ class Translation extends Model
     /**
      * Boot method to declare event handlers
      */
-    public static function boot()
+    public static function boot(): void
     {
         static::bootTraits();
 

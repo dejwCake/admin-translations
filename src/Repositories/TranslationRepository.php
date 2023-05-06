@@ -44,7 +44,7 @@ class TranslationRepository
 
     /**
      * @param Translation $translation
-     * @param $locale
+     * @param string $locale
      * @return bool
      */
     protected function isCurrentTransForTranslationArray(Translation $translation, string $locale): bool
