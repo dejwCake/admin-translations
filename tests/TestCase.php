@@ -9,6 +9,7 @@ use Brackets\AdminTranslations\Translation;
 use Brackets\Translatable\TranslatableServiceProvider;
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -20,8 +21,8 @@ abstract class TestCase extends Orchestra
 {
     use RefreshDatabase;
 
-    /** @var \Brackets\AdminTranslations\Translation */
-    protected $languageLine;
+    /** @var Translation */
+    protected Translation $languageLine;
 
     public function setUp(): void
     {
@@ -63,7 +64,7 @@ abstract class TestCase extends Orchestra
     /**
      * @param Application $app
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         $app['path.lang'] = $this->getFixturesDirectory('lang');
 
@@ -73,8 +74,22 @@ abstract class TestCase extends Orchestra
             $app['config']->set('database.default', 'pgsql');
             $app['config']->set('database.connections.pgsql', [
                 'driver' => 'pgsql',
-                'host' => 'testing',
+                'host' => 'pgsql',
                 'port' => '5432',
+                'database' => env('DB_DATABASE', 'laravel'),
+                'username' => env('DB_USERNAME', 'root'),
+                'password' => env('DB_PASSWORD', 'bestsecret'),
+                'charset' => 'utf8',
+                'prefix' => '',
+                'schema' => 'public',
+                'sslmode' => 'prefer',
+            ]);
+        } else if (env('DB_CONNECTION') === 'mysql') {
+            $app['config']->set('database.default', 'mysql');
+            $app['config']->set('database.connections.mysql', [
+                'driver' => 'mysql',
+                'host' => 'mysql',
+                'port' => '3306',
                 'database' => env('DB_DATABASE', 'laravel'),
                 'username' => env('DB_USERNAME', 'root'),
                 'password' => env('DB_PASSWORD', 'bestsecret'),
@@ -108,24 +123,5 @@ abstract class TestCase extends Orchestra
     protected function createTranslation(string $namespace, string $group, string $key, array $text): Translation
     {
         return Translation::create(compact('group', 'key', 'namespace', 'text'));
-    }
-
-    public function disableExceptionHandling()
-    {
-        $this->app->instance(ExceptionHandler::class, new class extends Handler {
-            public function __construct()
-            {
-            }
-
-            public function report(Exception $e)
-            {
-                // no-op
-            }
-
-            public function render($request, Exception $e)
-            {
-                throw $e;
-            }
-        });
     }
 }

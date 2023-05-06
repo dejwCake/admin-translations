@@ -11,7 +11,7 @@ use Illuminate\Translation\Translator;
 class DbLanguageLineTest extends TestCase
 {
     /** @var \Brackets\AdminTranslations\Translation */
-    protected $languageLine;
+    protected Translation $languageLine;
 
     /** @test */
     public function it_can_get_a_translation_for_the_current_app_locale()

@@ -4,13 +4,14 @@ namespace Brackets\AdminTranslations\Test\Feature\TestsFromSpatie;
 
 use Brackets\AdminTranslations\Test\Feature\TestsFromSpatie\TranslationManagers\DummyManager;
 use Brackets\AdminTranslations\Test\TestCase;
+use Illuminate\Foundation\Application;
 
 class DummyManagerTest extends TestCase
 {
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param Application $app
      */
-    protected function getEnvironmentSetUp($app)
+    protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
         $app['config']->set('admin-translations.translation_manager', DummyManager::class);

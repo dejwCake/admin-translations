@@ -10,6 +10,22 @@ This packages is part of [Craftable](https://github.com/BRACKETS-by-TRIAD/crafta
 
 You can find full documentation at https://docs.getcraftable.com/#/admin-translations
 
+
+## Run tests
+
+To run tests use this docker environment.
+
+```shell
+  docker-compose run -it test vendor/bin/phpunit
+```
+
+To switch between postgresql and mariadb change in `docker-compose.yml` DB_CONNECTION environmental variable:
+
+```git
+- DB_CONNECTION: pgsql
++ DB_CONNECTION: mysql
+```
+
 ## Issues
 Where do I report issues?
 If something is not working as expected, please open an issue in the main repository https://github.com/BRACKETS-by-TRIAD/craftable.
