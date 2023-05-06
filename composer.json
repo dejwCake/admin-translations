@@ -38,9 +38,9 @@
         "illuminate/database": "^6.0|^7.0|^8.0|^9.0",
         "illuminate/support": "^6.0|^7.0|^8.0|^9.0",
         "illuminate/console": "^6.0|^7.0|^8.0|^9.0",
-        "brackets/admin-ui": "^4.0",
-        "brackets/admin-listing": "^3.0",
-        "brackets/translatable": "^2.0"
+        "dejwcake/admin-ui": "dev-main",
+        "dejwcake/admin-listing": "dev-main",
+        "dejwcake/craftable-translatable": "dev-main"
     },
     "require-dev": {
         "orchestra/testbench": "~4.0|~5.0|~6.0|~7.0",
@@ -48,6 +48,20 @@
         "doctrine/dbal": "~2.5.13|^2.6",
         "mockery/mockery": "^1.0"
     },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/dejwCake/admin-listing.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/dejwCake/admin-ui.git"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/dejwCake/craftable-translatable.git"
+        }
+    ],
     "autoload": {
         "classmap": [],
         "psr-4": {
@@ -64,9 +78,6 @@
             "providers": [
                 "Brackets\\AdminTranslations\\AdminTranslationsServiceProvider"
             ]
-        },
-        "branch-alias": {
-            "dev-master": "4.0-dev"
         }
     }
 }
