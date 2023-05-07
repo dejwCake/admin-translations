@@ -33,4 +33,4 @@ services:
 
 networks:
   default:
-    name: admin-generator
+    name: admin-translations
