@@ -1,7 +1,6 @@
-version: '3.7'
 services:
   test:
-    image: dejwcake/php8.1:1
+    image: dejwcake/php8.2:1
     environment:
       DB_CONNECTION: pgsql
     volumes:
@@ -11,7 +10,7 @@ services:
       - mysql
 
   pgsql:
-    image: dejwcake/postgres15:1
+    image: dejwcake/postgres17:1
     environment:
       POSTGRES_DB: "${DB_DATABASE:-laravel}"
       POSTGRES_USER: "${DB_USERNAME:-root}"
@@ -19,7 +18,7 @@ services:
       PGPASSWORD: "${DB_PASSWORD:-bestsecret}"
 
   mysql:
-    image: dejwcake/mariadb10.11:1
+    image: dejwcake/mariadb11.6:1
     environment:
       MYSQL_DATABASE: "${DB_DATABASE:-laravel}"
       MYSQL_USER: "${DB_USERNAME:-root}"
@@ -27,7 +26,7 @@ services:
       MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-bestsecret}"
 
   php-qa:
-    image: dejwcake/phpqa8.2:2
+    image: dejwcake/phpqa8.4:1
     volumes:
       - .:/var/www/html:delegated
 
