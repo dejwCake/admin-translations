@@ -6,8 +6,6 @@ namespace Brackets\AdminTranslations;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
-use Symfony\Component\Finder\SplFileInfo;
-use function assert;
 
 /*
  * This class is a fork from themsaid/laravel-langman and adjusted to our purpose.

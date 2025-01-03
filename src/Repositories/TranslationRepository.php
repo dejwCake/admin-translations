@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminTranslations\Repositories;
 
 use Brackets\AdminTranslations\Translation;
+
 use function assert;
 
 class TranslationRepository
