@@ -1,0 +1,23 @@
+includes:
+	- phpstan-baseline.neon
+	- ./vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 5
+    phpVersion: 80200
+    reportUnmatchedIgnoredErrors: false
+
+    tmpDir: .phpstan.cache
+
+    paths:
+        - ./config
+        - ./database
+        - ./resources
+        - ./routes
+        - ./src
+        - ./tests
+
+    ignoreErrors:
+
+    excludePaths:
+        - ./tests/fixtures/*
