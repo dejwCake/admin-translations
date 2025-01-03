@@ -13,12 +13,14 @@ class DummyManagerTest extends TestCase
     /**
      * @param Application $app
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
- */
+     */
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
 
-        $app['config']->set('admin-translations.translation_manager', DummyManager::class);
+        $app->singleton('translation.loader', static function ($app) {
+            return new DummyManager($app['files'], $app['path.lang']);
+        });
     }
 
     public function testItAllowToChangeTranslationManager(): void
