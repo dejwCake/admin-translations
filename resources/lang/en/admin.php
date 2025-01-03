@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'title' => 'Translations',
 
@@ -40,7 +42,7 @@ return [
         'language_to_export' => 'Language to export',
         'export_reference_language' => 'Export reference language - this is useful if you want to see the translation '
             . 'in the original language in a separate column, so you can easily compare.',
-        'reference_langauge' => 'Reference language'
+        'reference_langauge' => 'Reference language',
     ],
 
     'index' => [

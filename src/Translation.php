@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * @property string $namespace
@@ -44,11 +46,11 @@ class Translation extends Model
     {
         static::bootTraits();
 
-        static::saved(static function (Translation $translation) {
+        static::saved(static function (self $translation): void {
             $translation->flushGroupCache();
         });
 
-        static::deleted(static function (Translation $translation) {
+        static::deleted(static function (self $translation): void {
             $translation->flushGroupCache();
         });
     }
@@ -61,16 +63,15 @@ class Translation extends Model
         if ($namespace === '' || $namespace === null) {
             $namespace = '*';
         }
-        return Cache::rememberForever(static::getCacheKey($namespace, $group, $locale),
-            static function () use ($namespace, $group, $locale) {
-                return static::query()
+
+        return Cache::rememberForever(
+            static::getCacheKey($namespace, $group, $locale),
+            static fn () => static::query()
                         ->where('namespace', $namespace)
                         ->where('group', $group)
                         ->get()
-                        ->reject(static function (Translation $translation) use ($locale, $group) {
-                            return empty($translation->getTranslation($locale, $group));
-                        })
-                        ->reduce(static function ($translations, Translation $translation) use ($locale, $group) {
+                        ->reject(static fn (self $translation) => $translation->getTranslation($locale, $group) === '')
+                        ->reduce(static function ($translations, self $translation) use ($locale, $group) {
                             if ($group === '*') {
                                 $translations[$translation->key] = $translation->getTranslation($locale, $group);
                             } else {
@@ -78,8 +79,8 @@ class Translation extends Model
                             }
 
                             return $translations;
-                        }) ?? [];
-            });
+                        }) ?? [],
+        );
     }
 
     public static function getCacheKey(string $namespace, string $group, string $locale): string
@@ -94,6 +95,7 @@ class Translation extends Model
 
             return $this->text[$fallback] ?? $this->key;
         }
+
         return $this->text[$locale] ?? '';
     }
 

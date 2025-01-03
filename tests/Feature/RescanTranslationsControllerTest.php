@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Tests\Feature;
 
 use Brackets\AdminTranslations\Tests\TestCase;
@@ -9,8 +11,7 @@ use Illuminate\Support\Facades\Gate;
 
 class RescanTranslationsControllerTest extends TestCase
 {
-
-    public function testRescanFillsUpTranslationsTable()
+    public function testRescanFillsUpTranslationsTable(): void
     {
         $this->authorizedToRescan();
 
@@ -35,14 +36,10 @@ class RescanTranslationsControllerTest extends TestCase
     /** @param array<string> $actions */
     private function authorizedTo(array $actions): void
     {
-        $this->actingAs(new User, 'admin');
-        Gate::define('admin', function () {
-            return true;
-        });
-        (new Collection($actions))->each(function ($action) {
-            Gate::define('admin.translation.'.$action, function () {
-                return true;
-            });
+        $this->actingAs(new User(), 'admin');
+        Gate::define('admin', static fn () => true);
+        (new Collection($actions))->each(static function ($action): void {
+            Gate::define('admin.translation.' . $action, static fn () => true);
         });
     }
 }

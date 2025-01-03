@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\TranslationLoaders;
 
 use Brackets\AdminTranslations\Exceptions\InvalidConfiguration;
@@ -22,13 +24,12 @@ class Db implements TranslationLoader
 
     /**
      * @throws InvalidConfiguration
-     * @return string
      */
     protected function getConfiguredModelClass(): string
     {
         $modelClass = config('admin-translations.model');
 
-        if (!is_a(new $modelClass, Translation::class)) {
+        if (!is_a(new $modelClass(), Translation::class)) {
             throw InvalidConfiguration::invalidModel($modelClass);
         }
 

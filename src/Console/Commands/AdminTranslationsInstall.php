@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Console\Commands;
 
 use Illuminate\Console\Command;
@@ -40,7 +42,7 @@ class AdminTranslationsInstall extends Command
 
         $this->call('vendor:publish', [
             '--provider' => "Brackets\\Translatable\\TranslatableServiceProvider",
-            '--tag' => 'config'
+            '--tag' => 'config',
         ]);
 
         $this->frontendAdjustments();
@@ -49,8 +51,9 @@ class AdminTranslationsInstall extends Command
             resource_path('views/admin/layout/sidebar.blade.php'),
             '|url\(\'admin\/translations\'\)|',
             '{{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
+            //phpcs:ignore SlevomatCodingStandard.Files.LineLength.LineTooLong
             '<li class="nav-item"><a class="nav-link" href="{{ url(\'admin/translations\') }}"><i class="nav-icon icon-location-pin"></i> {{ __(\'Translations\') }}</a></li>
-            {{-- Do not delete me :) I\'m also used for auto-generation menu items --}}'
+            {{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
         );
 
         $this->call('migrate');
@@ -58,8 +61,12 @@ class AdminTranslationsInstall extends Command
         $this->info('Package brackets/admin-translations installed');
     }
 
-    private function strReplaceInFile(string $fileName, string $ifExistsRegex, string $find, string $replaceWith): bool|int
-    {
+    private function strReplaceInFile(
+        string $fileName,
+        string $ifExistsRegex,
+        string $find,
+        string $replaceWith,
+    ): bool|int {
         $content = File::get($fileName);
         if (preg_match($ifExistsRegex, $content)) {
             return false;
@@ -79,7 +86,7 @@ class AdminTranslationsInstall extends Command
             '|vendor/brackets/admin-translations|',
             '// Do not delete this comment, it\'s used for auto-generation :)',
             'path.resolve(__dirname, \'vendor/brackets/admin-translations/resources/assets/js\'),
-				// Do not delete this comment, it\'s used for auto-generation :)'
+				// Do not delete this comment, it\'s used for auto-generation :)',
         );
 
         $this->info('Admin Translation assets registered');

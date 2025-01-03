@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie;
 
 use Brackets\AdminTranslations\Tests\TestCase;
@@ -7,14 +9,14 @@ use Brackets\AdminTranslations\TranslationLoaders\Db;
 
 class TranslationManagerLanguageLineTest extends TestCase
 {
-    public function testItWillNotUseDatabaseTranslationsIfTheProviderIsNotConfigured()
+    public function testItWillNotUseDatabaseTranslationsIfTheProviderIsNotConfigured(): void
     {
         $this->app['config']->set('admin-translations.translation_loaders', []);
 
         self::assertEquals('group.key', trans('group.key'));
     }
 
-    public function testItWillMergeTranslationFromAllProviders()
+    public function testItWillMergeTranslationFromAllProviders(): void
     {
         $this->app['config']->set('admin-translations.translation_loaders', [
             Db::class,

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations;
 
 use Brackets\AdminTranslations\TranslationLoaders\TranslationLoader;
@@ -14,9 +16,6 @@ class TranslationLoaderManager extends FileLoader
      * @param string $locale
      * @param string $group
      * @param string $namespace
-     *
-     * @return array
-     *
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function load($locale, $group, $namespace = null): array
@@ -31,18 +30,17 @@ class TranslationLoaderManager extends FileLoader
     /**
      * @return array<array<string, string>>
      */
-    protected function getTranslationsForTranslationLoaders(
-        string $locale,
-        string $group,
-        string $namespace
-    ): array {
+    protected function getTranslationsForTranslationLoaders(string $locale, string $group, string $namespace): array
+    {
         return (new Collection(config('admin-translations.translation_loaders')))
-            ->map(static function (string $className) {
-                return app($className);
-            })
-            ->mapWithKeys(static function (TranslationLoader $translationLoader) use ($locale, $group, $namespace) {
-                return $translationLoader->loadTranslations($locale, $group, $namespace);
-            })
+            ->map(static fn (string $className) => app($className))
+            ->mapWithKeys(
+                static fn (TranslationLoader $translationLoader) => $translationLoader->loadTranslations(
+                    $locale,
+                    $group,
+                    $namespace,
+                ),
+            )
             ->toArray();
     }
 }

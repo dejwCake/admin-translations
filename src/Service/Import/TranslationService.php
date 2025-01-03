@@ -1,19 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Service\Import;
 
 use Brackets\AdminTranslations\Imports\TranslationsImport;
 use Brackets\AdminTranslations\Repositories\TranslationRepository;
 use Brackets\AdminTranslations\Translation;
-use Exception;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 
 class TranslationService
 {
-    public function __construct(
-        private readonly TranslationRepository $translationRepository
-    ) {
+    public function __construct(private readonly TranslationRepository $translationRepository)
+    {
     }
 
     /**
@@ -21,13 +21,13 @@ class TranslationService
      */
     public function saveCollection(Collection $filteredCollection, string $language): void
     {
-        $filteredCollection->each(function ($item) use ($language) {
+        $filteredCollection->each(function ($item) use ($language): void {
             $this->translationRepository->createOrUpdate(
                 $item['namespace'],
                 $item['group'],
                 $item['default'],
                 $language,
-                $item[$language]
+                $item[$language],
             );
         });
     }
@@ -55,14 +55,20 @@ class TranslationService
      */
     public function rowValueEqualsValueInArray(array $row, array $array, string $chosenLanguage): bool
     {
-        if (!empty($array[$this->buildKeyForArray($row)]['text'])) {
-            if (isset($array[$this->buildKeyForArray($row)]['text'][$chosenLanguage])) {
+        $keyForArray = $this->buildKeyForArray($row);
+        if (
+            isset($array[$keyForArray]['text'])
+            && is_array($array[$keyForArray]['text'])
+            && $array[$keyForArray]['text'] !== []
+        ) {
+            if (isset($array[$keyForArray]['text'][$chosenLanguage])) {
                 return $this->rowExistsInArray($row, $array)
-                    && (string)$row[$chosenLanguage] === (string)$array[$this->buildKeyForArray($row)]['text'][$chosenLanguage];
+                    && (string) $row[$chosenLanguage] === (string) $array[$keyForArray]['text'][$chosenLanguage];
             } else {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -73,12 +79,14 @@ class TranslationService
             //TODO this does not look ok
             if (isset($translation->text->{$chosenLanguage})) {
                 return array_key_exists($chosenLanguage, $translation->text)
-                    && (string)$translation->text->{$chosenLanguage} !== '';
+                    && (string) $translation->text->{$chosenLanguage} !== '';
             }
+
             return true;
-        })->keyBy(static function (Translation $translation) {
-            return $translation->namespace . '.' . $translation->group . '.' . $translation->key;
-        })->toArray();
+        })->keyBy(
+            static fn (Translation $translation)
+            => $translation->namespace . '.' . $translation->group . '.' . $translation->key,
+        )->toArray();
     }
 
     /**
@@ -86,17 +94,22 @@ class TranslationService
      * @param Collection<array<string, string|bool>> $collectionToUpdate
      * @return array<string, int>
      */
-    public function checkAndUpdateTranslations(string $chosenLanguage, array $existingTranslations, Collection $collectionToUpdate): array
-    {
+    public function checkAndUpdateTranslations(
+        string $chosenLanguage,
+        array $existingTranslations,
+        Collection $collectionToUpdate,
+    ): array {
         $numberOfImportedTranslations = 0;
         $numberOfUpdatedTranslations = 0;
 
         $collectionToUpdate->map(function ($item) use (
             $chosenLanguage,
             $existingTranslations,
+            //phpcs:ignore SlevomatCodingStandard.PHP.DisallowReference.DisallowedInheritingVariableByReference
             &$numberOfUpdatedTranslations,
-            &$numberOfImportedTranslations
-        ) {
+            //phpcs:ignore SlevomatCodingStandard.PHP.DisallowReference.DisallowedInheritingVariableByReference
+            &$numberOfImportedTranslations,
+        ): void {
             if (isset($existingTranslations[$this->buildKeyForArray($item)]['id'])) {
                 $id = $existingTranslations[$this->buildKeyForArray($item)]['id'];
                 $existingTranslationInDatabase = Translation::find($id);
@@ -119,14 +132,14 @@ class TranslationService
                     $item['group'],
                     $item['default'],
                     $chosenLanguage,
-                    $item[$chosenLanguage]
+                    $item[$chosenLanguage],
                 );
             }
         });
 
         return [
             'numberOfImportedTranslations' => $numberOfImportedTranslations,
-            'numberOfUpdatedTranslations' => $numberOfUpdatedTranslations
+            'numberOfUpdatedTranslations' => $numberOfUpdatedTranslations,
         ];
     }
 
@@ -135,8 +148,11 @@ class TranslationService
      * @param array<string, Translation> $existingTranslations
      * @return Collection<array<string, string|bool>>
      */
-    public function getCollectionWithConflicts(Collection $collectionFromImportedFile, array $existingTranslations, string $chosenLanguage): Collection
-    {
+    public function getCollectionWithConflicts(
+        Collection $collectionFromImportedFile,
+        array $existingTranslations,
+        string $chosenLanguage,
+    ): Collection {
         return $collectionFromImportedFile->map(function (array $row) use ($existingTranslations, $chosenLanguage) {
             $row['has_conflict'] = false;
             $keyForArray = $this->buildKeyForArray($row);
@@ -155,6 +171,7 @@ class TranslationService
                     $row['has_conflict'] = false;
                 }
             }
+
             return $row;
         });
     }
@@ -164,9 +181,7 @@ class TranslationService
      */
     public function getNumberOfConflicts(Collection $collectionWithConflicts): int
     {
-        return $collectionWithConflicts->filter(static function (array $row) {
-            return $row['has_conflict'];
-        })->count();
+        return $collectionWithConflicts->filter(static fn (array $row) => $row['has_conflict'])->count();
     }
 
     /**
@@ -174,12 +189,11 @@ class TranslationService
      * @param array<string, Translation> $existingTranslations
      * @return Collection<array<string, string>>
      */
-    public function getFilteredExistingTranslations(Collection $collectionFromImportedFile, array $existingTranslations): Collection
-    {
-        return $collectionFromImportedFile->reject(function ($row) use ($existingTranslations) {
-            // filter out rows representing translations existing in the database (treat deleted_at as non-existing)
-            return $this->rowExistsInArray($row, $existingTranslations);
-        });
+    public function getFilteredExistingTranslations(
+        Collection $collectionFromImportedFile,
+        array $existingTranslations,
+    ): Collection {
+        return $collectionFromImportedFile->reject(fn ($row) => $this->rowExistsInArray($row, $existingTranslations));
     }
 
     /** @param Collection<array<string, string>> $collectionToImport */
@@ -211,7 +225,7 @@ class TranslationService
             }
 
             return $collectionFromImportedFile;
-        } catch (Exception $e) {
+        } catch (\Throwable) {
             abort(409, 'Unsupported file type');
         }
     }

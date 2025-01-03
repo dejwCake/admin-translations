@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie;
 
 use Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie\TranslationManagers\DummyManager;
@@ -15,6 +17,7 @@ class DummyManagerTest extends TestCase
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);
+
         $app['config']->set('admin-translations.translation_manager', DummyManager::class);
     }
 

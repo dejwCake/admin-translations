@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Tests;
 
 use Brackets\AdminTranslations\AdminTranslationsServiceProvider;
@@ -18,7 +20,6 @@ abstract class TestCase extends Orchestra
 {
     use RefreshDatabase;
 
-    /** @var Translation */
     protected Translation $languageLine;
 
     public function setUp(): void
@@ -27,7 +28,7 @@ abstract class TestCase extends Orchestra
 
         Artisan::call('migrate');
 
-        Schema::create('translations', function (Blueprint $table) {
+        Schema::create('translations', static function (Blueprint $table): void {
             $table->increments('id');
             $table->string('namespace')->default('*');
             $table->index('namespace');
@@ -42,7 +43,7 @@ abstract class TestCase extends Orchestra
 
         $this->languageLine = $this->createTranslation('*', 'group', 'key', ['en' => 'english', 'nl' => 'nederlands']);
 
-        File::copyDirectory(__DIR__.'/fixtures/resources/views', resource_path('views'));
+        File::copyDirectory(__DIR__ . '/fixtures/resources/views', resource_path('views'));
     }
 
     /**
@@ -108,14 +109,14 @@ abstract class TestCase extends Orchestra
 
         $app['config']->set('admin-translations.model', Translation::class);
 
-        $app['config']->set('admin-translations.scanned_directories', [__DIR__.'/fixtures/views']);
+        $app['config']->set('admin-translations.scanned_directories', [__DIR__ . '/fixtures/views']);
 
         $app['config']->set('app.key', '6rE9Nz59bGRbeMATftriyQjrpF7DcOQm');
     }
 
     public function getFixturesDirectory(string $path): string
     {
-        return __DIR__."/fixtures/{$path}";
+        return __DIR__ . "/fixtures/{$path}";
     }
 
     //TODO reorder

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Tests\Feature;
 
 use Brackets\AdminTranslations\Tests\TestCase;
@@ -10,12 +12,16 @@ use Illuminate\Support\Facades\Gate;
 
 class TranslationsControllerTest extends TestCase
 {
-
-    public function testAuthorizedUserCanSeeTranslationsStoredInDatabase()
+    public function testAuthorizedUserCanSeeTranslationsStoredInDatabase(): void
     {
         $this->authorizedToIndex();
 
-        $this->createTranslation('*', 'admin', 'Default version', ['en' => '1 English version', 'sk' => '1 Slovak version']);
+        $this->createTranslation(
+            '*',
+            'admin',
+            'Default version',
+            ['en' => '1 English version', 'sk' => '1 Slovak version'],
+        );
         $this->createTranslation('*', 'admin', 'some.key', ['en' => '2 English version', 'sk' => '2 Slovak version']);
 
         $this->get('/admin/translations')
@@ -23,19 +29,25 @@ class TranslationsControllerTest extends TestCase
             ->assertSee('Default version')
             ->assertSee('some.key')
             ->assertSee('1 English version')
-////            ->assertDontSee('1 Slovak version') // it is there, but it's only in JS source object, not visible on page, but we're gonna skip this assertion
+            // it is there, but it's only in JS source object, not visible on page, but we're gonna skip this assertion
+//            ->assertDontSee('1 Slovak version')
             ->assertViewHas('locales', new Collection(['en', 'sk']))
             ;
 
         self::assertCount(3, Translation::all());
     }
 
-    public function testAuthorizedUserCanSearchForTranslations()
+    public function testAuthorizedUserCanSearchForTranslations(): void
     {
         self::markTestSkipped('This test has not been implemented yet.');
         $this->authorizedToIndex();
 
-        $this->createTranslation('*', 'admin', 'Default version', ['en' => '1English version', 'sk' => '1Slovak version']);
+        $this->createTranslation(
+            '*',
+            'admin',
+            'Default version',
+            ['en' => '1English version', 'sk' => '1Slovak version'],
+        );
         $this->createTranslation('*', 'admin', 'some.key', ['en' => '2English version', 'sk' => '2Slovak version']);
 
         $this->get('/admin/translations?search=1Slovak')
@@ -45,12 +57,22 @@ class TranslationsControllerTest extends TestCase
         ;
     }
 
-    public function testAuthorizedUserCanFilterByGroup()
+    public function testAuthorizedUserCanFilterByGroup(): void
     {
         $this->authorizedToIndex();
 
-        $this->createTranslation('*', 'admin', 'Default version', ['en' => '1 English version', 'sk' => '1 Slovak version']);
-        $this->createTranslation('*', 'frontend', 'some.key', ['en' => '2 English version', 'sk' => '2 Slovak version']);
+        $this->createTranslation(
+            '*',
+            'admin',
+            'Default version',
+            ['en' => '1 English version', 'sk' => '1 Slovak version'],
+        );
+        $this->createTranslation(
+            '*',
+            'frontend',
+            'some.key',
+            ['en' => '2 English version', 'sk' => '2 Slovak version'],
+        );
 
         $this->get('/admin/translations?group=admin')
             ->assertStatus(200)
@@ -59,12 +81,10 @@ class TranslationsControllerTest extends TestCase
         ;
     }
 
-    public function testNotAuthorizedUserCannotSeeOrUpdateAnything()
+    public function testNotAuthorizedUserCannotSeeOrUpdateAnything(): void
     {
-        $this->actingAs(new User, 'admin');
-        Gate::define('admin', function () {
-            return true;
-        });
+        $this->actingAs(new User(), 'admin');
+        Gate::define('admin', static fn () => true);
 
         $this->json('GET', '/admin/translations')
             ->assertStatus(403)
@@ -75,19 +95,23 @@ class TranslationsControllerTest extends TestCase
         ;
     }
 
-
-    public function testAuthorizedUserCanUpdateATranslation()
+    public function testAuthorizedUserCanUpdateATranslation(): void
     {
         $this->authorizedToUpdate();
 
-        $line = $this->createTranslation('*', 'admin', 'Default version', ['en' => '1 English version', 'sk' => '1 Slovak version']);
+        $line = $this->createTranslation(
+            '*',
+            'admin',
+            'Default version',
+            ['en' => '1 English version', 'sk' => '1 Slovak version'],
+        );
 
-        $this->post('/admin/translations/'.$line->id, [
+        $this->post('/admin/translations/' . $line->id, [
             'text' => [
-                'sk'=> '1 Slovak changed version'
-            ]
+                'sk' => '1 Slovak changed version',
+            ],
         ], [
-            'X-Requested-With' => 'XMLHttpRequest'
+            'X-Requested-With' => 'XMLHttpRequest',
         ])
             ->assertStatus(200)
             ->assertJson([])
@@ -109,12 +133,8 @@ class TranslationsControllerTest extends TestCase
 
     private function authorizedTo(string $action): void
     {
-        $this->actingAs(new User, 'admin');
-        Gate::define('admin', function () {
-            return true;
-        });
-        Gate::define('admin.translation.'.$action, function () {
-            return true;
-        });
+        $this->actingAs(new User(), 'admin');
+        Gate::define('admin', static fn () => true);
+        Gate::define('admin.translation.' . $action, static fn () => true);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Imports;
 
 use Illuminate\Support\Collection;
@@ -11,7 +13,11 @@ class TranslationsImport implements ToCollection, WithHeadingRow
 {
     use Importable;
 
-    public function collection(Collection $collection)
+    /**
+     * @param Collection<array<string, string>> $collection
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function collection(Collection $collection): void
     {
         // we don't want to store anything yet, so we leave this method empty
     }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Brackets\AdminTranslations\Translation;
 use Brackets\AdminTranslations\TranslationLoaderManager;
 use Brackets\AdminTranslations\TranslationLoaders\Db;

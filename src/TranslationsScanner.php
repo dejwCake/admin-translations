@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations;
 
 use Illuminate\Filesystem\Filesystem;
@@ -17,7 +19,6 @@ class TranslationsScanner
 {
     /**
      * The paths to directories where we look for localised strings to scan.
-     *
      */
     private Collection $scannedPaths;
 
@@ -53,57 +54,90 @@ class TranslationsScanner
             'Lang::trans',
             'Lang::transChoice',
             '@lang',
-            '@choice'
+            '@choice',
         ];
 
         $patternA =
             // See https://regex101.com/r/jS5fX0/4
-            '[^\w]' . // Must not start with any alphanum or _
-            '(?<!->)' . // Must not start with ->
-            '(' . implode('|', $functions) . ')' .// Must start with one of the functions
-            "\(" .// Match opening parentheses
-            "[\'\"]" .// Match " or '
-            '(' .// Start a new group to match:
+            // Must not start with any alphanum or _
+            '[^\w]' .
+            // Must not start with ->
+            '(?<!->)' .
+            // Must start with one of the functions
+            '(' . implode('|', $functions) . ')' .
+            // Match opening parentheses
+            "\(" .
+            // Match " or '
+            "[\'\"]" .
+            // Start a new group to match:
+            '(' .
             '([a-zA-Z0-9_\/-]+::)?' .
-            '[a-zA-Z0-9_-]+' .// Must start with group
-            "([.][^\1)$]+)+" .// Be followed by one or more items/keys
-            ')' .// Close group
-            "[\'\"]" .// Closing quote
-            "[\),]"  // Close parentheses or new parameter
+            // Must start with group
+            '[a-zA-Z0-9_-]+' .
+            // Be followed by one or more items/keys
+            "([.][^\1)$]+)+" .
+            // Close group
+            ')' .
+            // Closing quote
+            "[\'\"]" .
+            // Close parentheses or new parameter
+            "[\),]"
         ;
 
         $patternB =
             // See https://regex101.com/r/2EfItR/2
-            '[^\w]' . // Must not start with any alphanum or _
-            '(?<!->)' . // Must not start with ->
-            '(__|Lang::getFromJson)' .// Must start with one of the functions
-            '\(' .// Match opening parentheses
+            // Must not start with any alphanum or _
+            '[^\w]' .
+            // Must not start with ->
+            '(?<!->)' .
+            // Must start with one of the functions
+            '(__|Lang::getFromJson)' .
+            // Match opening parentheses
+            '\(' .
 
-            '[\"]' .// Match "
-            '(' .// Start a new group to match:
-            '[^"]+' . //Can have everything except "
-//            '(?:[^"]|\\")+' . //Can have everything except " or can have escaped " like \", however it is not working as expected
-            ')' .// Close group
-            '[\"]' .// Closing quote
+            // Match "
+            '[\"]' .
+            // Start a new group to match:
+            '(' .
+            //Can have everything except "
+            '[^"]+' .
+            //Can have everything except " or can have escaped " like \", however it is not working as expected
+//            '(?:[^"]|\\")+' .
+            // Close group
+            ')' .
+            // Closing quote
+            '[\"]' .
 
-            '[\)]'  // Close parentheses or new parameter
+            // Close parentheses or new parameter
+            '[\)]'
         ;
 
         $patternC =
             // See https://regex101.com/r/VaPQ7A/2
-            '[^\w]' . // Must not start with any alphanum or _
-            '(?<!->)' . // Must not start with ->
-            '(__|Lang::getFromJson)' .// Must start with one of the functions
-            '\(' .// Match opening parentheses
+            // Must not start with any alphanum or _
+            '[^\w]' .
+            // Must not start with ->
+            '(?<!->)' .
+            // Must start with one of the functions
+            '(__|Lang::getFromJson)' .
+            // Match opening parentheses
+            '\(' .
 
-            '[\']' .// Match '
-            '(' .// Start a new group to match:
-            "[^']+" . //Can have everything except '
-//            "(?:[^']|\\')+" . //Can have everything except 'or can have escaped ' like \', however it is not working as expected
-            ')' .// Close group
-            '[\']' .// Closing quote
+            // Match '
+            '[\']' .
+            // Start a new group to match:
+            '(' .
+            //Can have everything except '
+            "[^']+" .
+            //Can have everything except 'or can have escaped ' like \', however it is not working as expected
+//            "(?:[^']|\\')+" .
+            // Close group
+            ')' .
+            // Closing quote
+            '[\']' .
 
-            '[\)]'  // Close parentheses or new parameter
+            // Close parentheses or new parameter
+            '[\)]'
         ;
 
         $trans = new Collection();
@@ -111,8 +145,8 @@ class TranslationsScanner
 
         // FIXME maybe we can count how many times one translation is used and eventually display it to the user
 
-        /** @var SplFileInfo $file */
         foreach ($this->disk->allFiles($this->scannedPaths->toArray()) as $file) {
+            \assert($file instanceof SplFileInfo);
             if (preg_match_all("/$patternA/siU", $file->getContents(), $matches)) {
                 $trans->push($matches[2]);
             }
@@ -125,6 +159,7 @@ class TranslationsScanner
                 $__->push($matches[2]);
             }
         }
+
         return [$trans->flatten()->unique(), $__->flatten()->unique()];
     }
 }

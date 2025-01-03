@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Http\Responses;
 
 use Brackets\AdminTranslations\Translation;
@@ -28,16 +30,12 @@ class TranslationsAdminListingResponse implements Responsable
     {
         $locales = Translatable::getLocales();
 
-        if ($this->data instanceof LengthAwarePaginator) {
-            $collection = $this->data->getCollection();
-        } else {
-            $collection = $this->data;
-        }
+        $collection = $this->data instanceof LengthAwarePaginator ? $this->data->getCollection() : $this->data;
         $collection->map(function (Translation $translation) use ($locales) {
-            $locales->each(function (string $locale) use ($translation) {
+            $locales->each(function (string $locale) use ($translation): void {
                 $translation->setTranslation(
                     $locale,
-                    $this->getCurrentTransForTranslation($translation, $locale)
+                    $this->getCurrentTransForTranslation($translation, $locale),
                 );
             });
 

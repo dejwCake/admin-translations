@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Exports;
 
 use Brackets\AdminTranslations\Http\Requests\Admin\Translation\UpdateTranslation;
 use Brackets\AdminTranslations\Translation;
-use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -36,16 +37,15 @@ class TranslationsExport implements FromCollection, WithMapping, WithHeadings
             'Created at',
         ];
 
-        $this->exportLanguages->each(static function ($language) use (&$headings) {
-            $headings[] = mb_strtoupper($language);
-        });
+        $languageHeadings = $this->exportLanguages->map(
+            static fn ($language): string => mb_strtoupper($language),
+        )->toArray();
 
-        return $headings;
+        return array_merge($headings, $languageHeadings);
     }
 
     /**
      * @param Translation $translation
-     * @return array
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function map($translation): array
@@ -57,9 +57,9 @@ class TranslationsExport implements FromCollection, WithMapping, WithHeadings
             $translation->created_at,
         ];
 
-        $languages = $this->exportLanguages->map(function (string $language) use ($translation) {
-            return $this->getCurrentTransForTranslationLanguage($translation, $language);
-        });
+        $languages = $this->exportLanguages->map(
+            fn (string $language) => $this->getCurrentTransForTranslationLanguage($translation, $language),
+        );
 
         return array_merge($map, $languages->toArray());
     }
@@ -74,7 +74,7 @@ class TranslationsExport implements FromCollection, WithMapping, WithHeadings
             return trans(
                 stripslashes($translation->namespace) . '::' . $translation->group . '.' . $translation->key,
                 [],
-                $language
+                $language,
             );
         }
     }

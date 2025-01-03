@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'title' => 'Preklady',
 
@@ -39,7 +41,7 @@ return [
         'language_to_export' => 'Jazyk na importovanie',
         'export_reference_language' => 'Exportovať povôdný jazyk - užitočné ak chceš vidieť preklad v pôvodnom jazyku '
             . 'v rozdielnom stĺpci, preklady si môžeš jednoducho porovnať.',
-        'reference_langauge' => 'Pôvodný jazyk'
+        'reference_langauge' => 'Pôvodný jazyk',
     ],
 
     'index' => [

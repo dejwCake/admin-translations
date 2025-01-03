@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie\TranslationLoaders;
 
 use Brackets\AdminTranslations\Exceptions\InvalidConfiguration;
@@ -37,7 +39,7 @@ class DbLanguageLineTest extends TestCase
 
         self::assertEquals(
             'text with filled in placeholder',
-            trans('group.placeholder', ['placeholder' => 'filled in placeholder'])
+            trans('group.placeholder', ['placeholder' => 'filled in placeholder']),
         );
     }
 
@@ -88,13 +90,19 @@ class DbLanguageLineTest extends TestCase
     public function testItCanWorkWithACustomModel(): void
     {
         $alternativeModel = new class extends Translation {
-            public static function getTranslationsForGroupAndNamespace(string $locale, string $group, string $namespace): array
-            {
+            /**
+             * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+             */
+            public static function getTranslationsForGroupAndNamespace(
+                string $locale,
+                string $group,
+                string $namespace,
+            ): array {
                 return ['key' => 'alternative class'];
             }
         };
 
-        $this->app['config']->set('admin-translations.model', get_class($alternativeModel));
+        $this->app['config']->set('admin-translations.model', $alternativeModel::class);
 
         self::assertEquals('alternative class', trans('group.key'));
     }
@@ -104,7 +112,7 @@ class DbLanguageLineTest extends TestCase
         $invalidModel = new class {
         };
 
-        $this->app['config']->set('admin-translations.model', get_class($invalidModel));
+        $this->app['config']->set('admin-translations.model', $invalidModel::class);
 
         $this->expectException(InvalidConfiguration::class);
 

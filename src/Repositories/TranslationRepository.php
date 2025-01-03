@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Repositories;
 
 use Brackets\AdminTranslations\Translation;
@@ -8,12 +10,12 @@ class TranslationRepository
 {
     public function createOrUpdate(string $namespace, string $group, string $key, string $language, string $text): void
     {
-        /** @var Translation $translation */
         $translation = Translation::withTrashed()
             ->where('namespace', $namespace)
             ->where('group', $group)
             ->where('key', $key)
             ->first();
+        \assert($translation instanceof Translation);
 
         $defaultLocale = config('app.locale');
 
@@ -45,6 +47,8 @@ class TranslationRepository
             return is_array(trans($translation->group . '.' . $translation->key, [], $locale));
         }
 
-        return is_array(trans($translation->namespace . '::' . $translation->group . '.' . $translation->key, [], $locale));
+        return is_array(
+            trans($translation->namespace . '::' . $translation->group . '.' . $translation->key, [], $locale),
+        );
     }
 }

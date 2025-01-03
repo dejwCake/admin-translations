@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Console\Commands;
 
 use Brackets\AdminTranslations\Translation;
@@ -28,63 +30,64 @@ class ScanAndSave extends Command
      */
     protected $description = 'Scans all PHP files, extract translations and stores them into the database';
 
-    protected function getArguments(): array
-    {
-        return [
-            ['paths', InputArgument::IS_ARRAY, 'Array of paths to scan.', (array) config('admin-translations.scanned_directories')],
-        ];
-    }
-
     /**
      * Execute the console command.
      */
     public function handle(): void
     {
         $scanner = app(TranslationsScanner::class);
-        (new Collection($this->argument('paths')))->each(function ($path) use ($scanner) {
+        (new Collection($this->argument('paths')))->each(static function ($path) use ($scanner): void {
             $scanner->addScannedPath($path);
         });
 
-        list($trans, $__) = $scanner->getAllViewFilesWithTranslations();
+        [$trans, $__] = $scanner->getAllViewFilesWithTranslations();
+        assert($trans instanceof Collection);
+        assert($__ instanceof Collection);
 
-        /** @var Collection $trans */
-        /** @var Collection $__ */
-
-        DB::transaction(function () use ($trans, $__) {
+        DB::transaction(function () use ($trans, $__): void {
             Translation::query()
                 ->whereNull('deleted_at')
                 ->update([
-                    'deleted_at' => Carbon::now()
+                    'deleted_at' => Carbon::now(),
                 ]);
 
-            $trans->each(function ($trans) {
-                list($group, $key) = explode('.', $trans, 2);
+            $trans->each(function ($trans): void {
+                [$group, $key] = explode('.', $trans, 2);
                 $namespaceAndGroup = explode('::', $group, 2);
                 if (count($namespaceAndGroup) === 1) {
                     $namespace = '*';
                     $group = $namespaceAndGroup[0];
                 } else {
-                    list($namespace, $group) = $namespaceAndGroup;
+                    [$namespace, $group] = $namespaceAndGroup;
                 }
                 $this->createOrUpdate($namespace, $group, $key);
             });
 
-            $__->each(function ($default) {
+            $__->each(function ($default): void {
                 $this->createOrUpdate('*', '*', $default);
             });
 
-            $this->info(($trans->count() + $__->count()).' translations saved');
+            $this->info(($trans->count() + $__->count()) . ' translations saved');
         });
+    }
+
+    protected function getArguments(): array
+    {
+        return [
+            ['paths', InputArgument::IS_ARRAY, 'Array of paths to scan.', (array) config(
+                'admin-translations.scanned_directories',
+            )],
+        ];
     }
 
     protected function createOrUpdate(string $namespace, string $group, string $key): void
     {
-        /** @var Translation $translation */
         $translation = Translation::withTrashed()
             ->where('namespace', $namespace)
             ->where('group', $group)
             ->where('key', $key)
             ->first();
+        \assert($translation instanceof Translation);
 
         $defaultLocale = (string) config('app.locale');
 
@@ -113,9 +116,11 @@ class ScanAndSave extends Command
         }
 
         if ($translation->namespace === '*') {
-            return is_array(trans($translation->group.'.'.$translation->key, [], $locale));
+            return is_array(trans($translation->group . '.' . $translation->key, [], $locale));
         }
 
-        return is_array(trans($translation->namespace . '::' . $translation->group . '.' . $translation->key, [], $locale));
+        return is_array(
+            trans($translation->namespace . '::' . $translation->group . '.' . $translation->key, [], $locale),
+        );
     }
 }

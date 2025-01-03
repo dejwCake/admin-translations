@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations;
 
 use Brackets\AdminTranslations\Console\Commands\AdminTranslationsInstall;
@@ -12,7 +14,6 @@ use Illuminate\Support\ServiceProvider;
 
 class AdminTranslationsServiceProvider extends ServiceProvider
 {
-
     /**
      * Bootstrap any application services.
      */
@@ -34,7 +35,9 @@ class AdminTranslationsServiceProvider extends ServiceProvider
             if (!glob(base_path('database/migrations/*_create_translations_table.php'))) {
                 $timestamp = date('Y_m_d_His');
                 $this->publishes([
-                    __DIR__ . '/../database/migrations/create_translations_table.php' => database_path('migrations') . '/' . $timestamp . '_create_translations_table.php',
+                    __DIR__ . '/../database/migrations/create_translations_table.php' => database_path(
+                        'migrations',
+                    ) . '/' . $timestamp . '_create_translations_table.php',
                 ], 'migrations');
             }
         }
@@ -47,20 +50,11 @@ class AdminTranslationsServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/admin-translations.php', 'admin-translations');
 
-        $this->mergeConfigFrom(
-            __DIR__ . '/../config/admin-auth.php',
-            'admin-auth.defaults'
-        );
+        $this->mergeConfigFrom(__DIR__ . '/../config/admin-auth.php', 'admin-auth.defaults');
 
-        $this->mergeConfigFrom(
-            __DIR__ . '/../config/auth.guard.admin.php',
-            'auth.guards.admin'
-        );
+        $this->mergeConfigFrom(__DIR__ . '/../config/auth.guard.admin.php', 'auth.guards.admin');
 
-        $this->mergeConfigFrom(
-            __DIR__ . '/../config/auth.providers.admin_users.php',
-            'auth.providers.admin_users'
-        );
+        $this->mergeConfigFrom(__DIR__ . '/../config/auth.providers.admin_users.php', 'auth.providers.admin_users');
 
         if (config('admin-translations.use_routes', true)) {
             if (app(Router::class)->hasMiddlewareGroup('admin')) {

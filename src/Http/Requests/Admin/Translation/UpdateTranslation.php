@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Http\Requests\Admin\Translation;
 
 use Brackets\AdminTranslations\Translation;
@@ -21,13 +23,15 @@ class UpdateTranslation extends TranslatableFormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
     public function translatableRules(string $locale): array
     {
         return [
-            'text' => 'string|nullable',
-            'importLanguage' => 'string|nullable',
-            'resolvedTranslations' => 'array|nullable',
+            'text' => ['string', 'nullable'],
+            'importLanguage' => ['string', 'nullable'],
+            'resolvedTranslations' => ['array', 'nullable'],
         ];
     }
 

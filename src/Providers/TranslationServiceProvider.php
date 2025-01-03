@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Providers;
 
 use Illuminate\Translation\TranslationServiceProvider as IlluminateTranslationServiceProvider;
@@ -13,8 +15,9 @@ class TranslationServiceProvider extends IlluminateTranslationServiceProvider
      */
     protected function registerLoader(): void
     {
-        $this->app->singleton('translation.loader', function ($app) {
+        $this->app->singleton('translation.loader', static function ($app) {
             $class = config('admin-translations.translation_manager');
+
             return new $class($app['files'], $app['path.lang']);
         });
     }

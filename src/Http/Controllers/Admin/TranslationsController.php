@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Brackets\AdminTranslations\Http\Controllers\Admin;
 
 use Brackets\AdminListing\AdminListing;
@@ -19,7 +21,6 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
@@ -28,9 +29,12 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class TranslationsController extends BaseController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use AuthorizesRequests;
+    use DispatchesJobs;
+    use ValidatesRequests;
 
-    public function __construct(private readonly TranslationService $translationService) {
+    public function __construct(private readonly TranslationService $translationService)
+    {
     }
 
     /**
@@ -45,17 +49,15 @@ class TranslationsController extends BaseController
         $data = AdminListing::create(Translation::class)->processRequestAndGet(
         // pass the request with params
             $request,
-
             // set columns to query
             ['id', 'namespace', 'group', 'key', 'text', 'created_at', 'updated_at'],
-
             // set columns to searchIn
             ['group', 'key', 'text->en', 'text->sk'],
-            static function (Builder $query) use ($request) {
+            static function (Builder $query) use ($request): void {
                 if ($request->has('group')) {
                     $query->whereGroup($request->group);
                 }
-            }
+            },
         );
 
         return new TranslationsAdminListingResponse($data);
@@ -79,6 +81,7 @@ class TranslationsController extends BaseController
     {
         $currentTime = Carbon::now()->toDateTimeString();
         $nameOfExportedFile = 'translations' . $currentTime . '.xlsx';
+
         return Excel::download(new TranslationsExport($request), $nameOfExportedFile);
     }
 
@@ -91,24 +94,40 @@ class TranslationsController extends BaseController
             $chosenLanguage = $request->getChosenLanguage();
 
             try {
-                $collectionFromImportedFile = $this->translationService->getCollectionFromImportedFile($request->file('fileImport'), $chosenLanguage);
-            } catch (Exception $e) {
+                $collectionFromImportedFile = $this->translationService->getCollectionFromImportedFile(
+                    $request->file('fileImport'),
+                    $chosenLanguage,
+                );
+            } catch (\Throwable $e) {
                 return response()->json($e->getMessage(), 409);
             }
 
             $existingTranslations = $this->translationService->getAllTranslationsForGivenLang($chosenLanguage);
 
             if ($request->input('onlyMissing') === 'true') {
-                $filteredCollection = $this->translationService->getFilteredExistingTranslations($collectionFromImportedFile, $existingTranslations);
+                $filteredCollection = $this->translationService->getFilteredExistingTranslations(
+                    $collectionFromImportedFile,
+                    $existingTranslations,
+                );
                 $this->translationService->saveCollection($filteredCollection, $chosenLanguage);
 
-                return ['numberOfImportedTranslations' => count($filteredCollection), 'numberOfUpdatedTranslations' => 0];
+                return ['numberOfImportedTranslations' => count(
+                    $filteredCollection,
+                ), 'numberOfUpdatedTranslations' => 0];
             } else {
-                $collectionWithConflicts = $this->translationService->getCollectionWithConflicts($collectionFromImportedFile, $existingTranslations, $chosenLanguage);
+                $collectionWithConflicts = $this->translationService->getCollectionWithConflicts(
+                    $collectionFromImportedFile,
+                    $existingTranslations,
+                    $chosenLanguage,
+                );
                 $numberOfConflicts = $this->translationService->getNumberOfConflicts($collectionWithConflicts);
 
                 if ($numberOfConflicts === 0) {
-                    return $this->translationService->checkAndUpdateTranslations($chosenLanguage, $existingTranslations, $collectionWithConflicts);
+                    return $this->translationService->checkAndUpdateTranslations(
+                        $chosenLanguage,
+                        $existingTranslations,
+                        $collectionWithConflicts,
+                    );
                 }
 
                 return $collectionWithConflicts;
@@ -128,6 +147,10 @@ class TranslationsController extends BaseController
             return response()->json('Wrong syntax in your import', 409);
         }
 
-        return $this->translationService->checkAndUpdateTranslations($chosenLanguage, $existingTranslations, $resolvedConflicts);
+        return $this->translationService->checkAndUpdateTranslations(
+            $chosenLanguage,
+            $existingTranslations,
+            $resolvedConflicts,
+        );
     }
 }
