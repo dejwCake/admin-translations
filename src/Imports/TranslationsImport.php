@@ -11,9 +11,6 @@ class TranslationsImport implements ToCollection, WithHeadingRow
 {
     use Importable;
 
-    /**
-     * @param Collection $collection
-     */
     public function collection(Collection $collection)
     {
         // we don't want to store anything yet, so we leave this method empty

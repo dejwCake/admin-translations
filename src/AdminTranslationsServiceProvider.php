@@ -15,8 +15,6 @@ class AdminTranslationsServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
     public function boot(): void
     {
@@ -36,7 +34,7 @@ class AdminTranslationsServiceProvider extends ServiceProvider
             if (!glob(base_path('database/migrations/*_create_translations_table.php'))) {
                 $timestamp = date('Y_m_d_His');
                 $this->publishes([
-                    __DIR__ . '/../database/migrations/create_translations_table.php.stub' => database_path('migrations') . '/' . $timestamp . '_create_translations_table.php',
+                    __DIR__ . '/../database/migrations/create_translations_table.php' => database_path('migrations') . '/' . $timestamp . '_create_translations_table.php',
                 ], 'migrations');
             }
         }
@@ -44,8 +42,6 @@ class AdminTranslationsServiceProvider extends ServiceProvider
 
     /**
      * Register any application services.
-     *
-     * @return void
      */
     public function register(): void
     {
@@ -79,7 +75,7 @@ class AdminTranslationsServiceProvider extends ServiceProvider
         $this->app->register(TranslationServiceProvider::class);
 
         // provider auto-discovery has limits - in tests we have to explicitly register providers
-        if ($this->app->environment() == 'testing') {
+        if ($this->app->runningUnitTests()) {
             $this->app->register(AdminUIServiceProvider::class);
         }
     }

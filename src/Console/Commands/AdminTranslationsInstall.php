@@ -11,6 +11,7 @@ class AdminTranslationsInstall extends Command
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $signature = 'admin-translations:install {--dont-install-admin-ui}';
 
@@ -18,13 +19,12 @@ class AdminTranslationsInstall extends Command
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Install a brackets/admin-translations package';
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
     public function handle(): void
     {
@@ -58,18 +58,11 @@ class AdminTranslationsInstall extends Command
         $this->info('Package brackets/admin-translations installed');
     }
 
-    /**
-     * @param $fileName
-     * @param $ifExistsRegex
-     * @param $find
-     * @param $replaceWith
-     * @return bool|int|void
-     */
-    private function strReplaceInFile($fileName, $ifExistsRegex, $find, $replaceWith)
+    private function strReplaceInFile(string $fileName, string $ifExistsRegex, string $find, string $replaceWith): bool|int
     {
         $content = File::get($fileName);
         if (preg_match($ifExistsRegex, $content)) {
-            return;
+            return false;
         }
 
         return File::put($fileName, str_replace($find, $replaceWith, $content));

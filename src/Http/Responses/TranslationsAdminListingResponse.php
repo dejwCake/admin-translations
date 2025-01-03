@@ -5,7 +5,6 @@ namespace Brackets\AdminTranslations\Http\Responses;
 use Brackets\AdminTranslations\Translation;
 use Brackets\Translatable\Facades\Translatable;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -15,14 +14,8 @@ use Illuminate\View\View;
 
 class TranslationsAdminListingResponse implements Responsable
 {
-    /**
-     * @var LengthAwarePaginator
-     */
-    private $data;
-
-    public function __construct($data)
+    public function __construct(private readonly LengthAwarePaginator|Collection $data)
     {
-        $this->data = $data;
     }
 
     /**
@@ -33,10 +26,17 @@ class TranslationsAdminListingResponse implements Responsable
     {
         $locales = Translatable::getLocales();
 
-        $this->data->getCollection()->map(function ($translation) use ($locales) {
-            $locales->each(function ($locale) use ($translation) {
-                /** @var Translation $translation */
-                $translation->setTranslation($locale, $this->getCurrentTransForTranslation($translation, $locale));
+        if ($this->data instanceof LengthAwarePaginator) {
+            $collection = $this->data->getCollection();
+        } else {
+            $collection = $this->data;
+        }
+        $collection->map(function (Translation $translation) use ($locales) {
+            $locales->each(function (string $locale) use ($translation) {
+                $translation->setTranslation(
+                    $locale,
+                    $this->getCurrentTransForTranslation($translation, $locale)
+                );
             });
 
             return $translation;
@@ -53,12 +53,7 @@ class TranslationsAdminListingResponse implements Responsable
         ]);
     }
 
-    /**
-     * @param Translation $translation
-     * @param $locale
-     * @return array|Translator|string|null
-     */
-    private function getCurrentTransForTranslation(Translation $translation, $locale)
+    private function getCurrentTransForTranslation(Translation $translation, string $locale): array|string
     {
         if ($translation->group === '*') {
             return __($translation->key, [], $locale);
@@ -71,9 +66,6 @@ class TranslationsAdminListingResponse implements Responsable
         return trans($translation->namespace . '::' . $translation->group . '.' . $translation->key, [], $locale);
     }
 
-    /**
-     * @return Collection
-     */
     private function getUsedGroups(): Collection
     {
         return DB::table('translations')

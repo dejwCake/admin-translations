@@ -18,8 +18,11 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Routing\Redirector;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -27,22 +30,15 @@ class TranslationsController extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    protected $translationService;
-
-    public function __construct(
-        TranslationService $translationService
-    ) {
-        $this->translationService = $translationService;
+    public function __construct(private readonly TranslationService $translationService) {
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @param IndexTranslation $request
      * @throws Exception
-     * @return Responsable
      */
-    public function index(IndexTranslation $request)
+    public function index(IndexTranslation $request): Responsable|TranslationsAdminListingResponse
     {
 
         // create and AdminListing instance for a specific model and
@@ -67,12 +63,8 @@ class TranslationsController extends BaseController
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param UpdateTranslation $request
-     * @param Translation $translation
-     * @return Response|array
      */
-    public function update(UpdateTranslation $request, Translation $translation)
+    public function update(UpdateTranslation $request, Translation $translation): array|Redirector|RedirectResponse
     {
         $translation->update($request->validated());
 
@@ -83,11 +75,7 @@ class TranslationsController extends BaseController
         return redirect('admin/translation');
     }
 
-    /**
-     * @param UpdateTranslation $request
-     * @return BinaryFileResponse
-     */
-    public function export(UpdateTranslation $request)
+    public function export(UpdateTranslation $request): BinaryFileResponse
     {
         $currentTime = Carbon::now()->toDateTimeString();
         $nameOfExportedFile = 'translations' . $currentTime . '.xlsx';
@@ -95,10 +83,9 @@ class TranslationsController extends BaseController
     }
 
     /**
-     * @param ImportTranslation $request
-     * @return array|JsonResponse|mixed
+     * @return array<string, int>|Collection<array<string, string|bool>>|JsonResponse
      */
-    public function import(ImportTranslation $request)
+    public function import(ImportTranslation $request): array|Collection|JsonResponse
     {
         if ($request->hasFile('fileImport')) {
             $chosenLanguage = $request->getChosenLanguage();
@@ -127,16 +114,13 @@ class TranslationsController extends BaseController
                 return $collectionWithConflicts;
             }
         }
+
         return response()->json('No file imported', 409);
     }
 
-    /**
-     * @param UpdateTranslation $request
-     * @return array|JsonResponse
-     */
-    public function importResolvedConflicts(UpdateTranslation $request)
+    public function importResolvedConflicts(UpdateTranslation $request): JsonResponse|array
     {
-        $resolvedConflicts = collect($request->getResolvedConflicts());
+        $resolvedConflicts = new Collection($request->getResolvedConflicts());
         $chosenLanguage = $request->getChosenLanguage();
         $existingTranslations = $this->translationService->getAllTranslationsForGivenLang($chosenLanguage);
 

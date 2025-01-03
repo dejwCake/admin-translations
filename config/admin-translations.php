@@ -1,5 +1,9 @@
 <?php
 
+use Brackets\AdminTranslations\Translation;
+use Brackets\AdminTranslations\TranslationLoaderManager;
+use Brackets\AdminTranslations\TranslationLoaders\Db;
+
 return [
 
     /*
@@ -7,19 +11,19 @@ return [
      * the Brackets\AdminTranslations\TranslationLoaders\TranslationLoader-interface.
      */
     'translation_loaders' => [
-        Brackets\AdminTranslations\TranslationLoaders\Db::class,
+        Db::class,
     ],
 
     /*
      * This is the model used by the Db Translation loader. You can put any model here
      * that extends Brackets\AdminTranslations\Translation.
      */
-    'model' => Brackets\AdminTranslations\Translation::class,
+    'model' => Translation::class,
 
     /*
      * This is the translation manager which overrides the default Laravel `translation.loader`
      */
-    'translation_manager' => Brackets\AdminTranslations\TranslationLoaderManager::class,
+    'translation_manager' => TranslationLoaderManager::class,
 
     /*
      * This option controls if package routes are used or not

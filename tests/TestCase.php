@@ -2,13 +2,10 @@
 
 namespace Brackets\AdminTranslations\Tests;
 
-use Brackets\AdminAuth\AdminAuthServiceProvider;
 use Brackets\AdminTranslations\AdminTranslationsServiceProvider;
-use Brackets\AdminTranslations\Tests\Exceptions\Handler;
 use Brackets\AdminTranslations\Translation;
+use Brackets\Translatable\Models\WithTranslations;
 use Brackets\Translatable\TranslatableServiceProvider;
-use Exception;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -68,6 +65,7 @@ abstract class TestCase extends Orchestra
     {
         $app['path.lang'] = $this->getFixturesDirectory('lang');
 
+        $app['config']->set('admin-listing.with-translations-class', WithTranslations::class);
         $app['config']->set('translatable.locales', ['en', 'sk']);
 
         if (env('DB_CONNECTION') === 'pgsql') {

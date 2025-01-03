@@ -6,69 +6,59 @@ use Brackets\AdminTranslations\Imports\TranslationsImport;
 use Brackets\AdminTranslations\Repositories\TranslationRepository;
 use Brackets\AdminTranslations\Translation;
 use Exception;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 
 class TranslationService
 {
-    /**
-     * @var TranslationRepository
-     */
-    protected $translationRepository;
-
-    /**
-     * TranslationService constructor.
-     *
-     * @param TranslationRepository $translationRepository
-     */
     public function __construct(
-        TranslationRepository $translationRepository
+        private readonly TranslationRepository $translationRepository
     ) {
-        $this->translationRepository = $translationRepository;
     }
 
     /**
-     * @param Collection $filteredCollection
-     * @param $language
+     * @param Collection<array<string, string>> $filteredCollection
      */
-    public function saveCollection(Collection $filteredCollection, $language): void
+    public function saveCollection(Collection $filteredCollection, string $language): void
     {
         $filteredCollection->each(function ($item) use ($language) {
-            $this->translationRepository->createOrUpdate($item['namespace'], $item['group'], $item['default'],
-                $language, $item[$language]);
+            $this->translationRepository->createOrUpdate(
+                $item['namespace'],
+                $item['group'],
+                $item['default'],
+                $language,
+                $item[$language]
+            );
         });
     }
 
     /**
-     * @param $row
-     * @return string
+     * @param array<string, string> $row
      */
-    public function buildKeyForArray($row): string
+    public function buildKeyForArray(array $row): string
     {
         return $row['namespace'] . '.' . $row['group'] . '.' . $row['default'];
     }
 
     /**
-     * @param $row
-     * @param $array
-     * @return bool
+     * @param array<string, string> $row
+     * @param array<string, string|Translation> $array
      */
-    public function rowExistsInArray($row, $array): bool
+    public function rowExistsInArray(array $row, array $array): bool
     {
         return array_key_exists($this->buildKeyForArray($row), $array);
     }
 
     /**
-     * @param $row
-     * @param $array
-     * @param $chosenLanguage
-     * @return bool
+     * @param array<string, string|int> $row
+     * @param array<string, Translation> $array
      */
-    public function rowValueEqualsValueInArray($row, $array, $chosenLanguage): bool
+    public function rowValueEqualsValueInArray(array $row, array $array, string $chosenLanguage): bool
     {
         if (!empty($array[$this->buildKeyForArray($row)]['text'])) {
             if (isset($array[$this->buildKeyForArray($row)]['text'][$chosenLanguage])) {
-                return $this->rowExistsInArray($row,
-                        $array) && (string)$row[$chosenLanguage] === (string)$array[$this->buildKeyForArray($row)]['text'][$chosenLanguage];
+                return $this->rowExistsInArray($row, $array)
+                    && (string)$row[$chosenLanguage] === (string)$array[$this->buildKeyForArray($row)]['text'][$chosenLanguage];
             } else {
                 return false;
             }
@@ -76,30 +66,27 @@ class TranslationService
         return true;
     }
 
-    /**
-     * @param $chosenLanguage
-     * @return array
-     */
-    public function getAllTranslationsForGivenLang($chosenLanguage): array
+    /** @return array<string, Translation> */
+    public function getAllTranslationsForGivenLang(string $chosenLanguage): array
     {
-        return Translation::all()->filter(static function ($translation) use ($chosenLanguage) {
+        return Translation::all()->filter(static function (Translation $translation) use ($chosenLanguage) {
+            //TODO this does not look ok
             if (isset($translation->text->{$chosenLanguage})) {
-                return array_key_exists($chosenLanguage,
-                        $translation->text) && (string)$translation->text->{$chosenLanguage} !== '';
+                return array_key_exists($chosenLanguage, $translation->text)
+                    && (string)$translation->text->{$chosenLanguage} !== '';
             }
             return true;
-        })->keyBy(static function ($translation) {
+        })->keyBy(static function (Translation $translation) {
             return $translation->namespace . '.' . $translation->group . '.' . $translation->key;
         })->toArray();
     }
 
     /**
-     * @param $chosenLanguage
-     * @param $existingTranslations
-     * @param $collectionToUpdate
-     * @return array
+     * @param array<string, Translation> $existingTranslations
+     * @param Collection<array<string, string|bool>> $collectionToUpdate
+     * @return array<string, int>
      */
-    public function checkAndUpdateTranslations($chosenLanguage, $existingTranslations, $collectionToUpdate): array
+    public function checkAndUpdateTranslations(string $chosenLanguage, array $existingTranslations, Collection $collectionToUpdate): array
     {
         $numberOfImportedTranslations = 0;
         $numberOfUpdatedTranslations = 0;
@@ -107,8 +94,7 @@ class TranslationService
         $collectionToUpdate->map(function ($item) use (
             $chosenLanguage,
             $existingTranslations,
-            &
-            $numberOfUpdatedTranslations,
+            &$numberOfUpdatedTranslations,
             &$numberOfImportedTranslations
         ) {
             if (isset($existingTranslations[$this->buildKeyForArray($item)]['id'])) {
@@ -128,8 +114,13 @@ class TranslationService
                 }
             } else {
                 $numberOfImportedTranslations++;
-                $this->translationRepository->createOrUpdate($item['namespace'], $item['group'], $item['default'],
-                    $chosenLanguage, $item[$chosenLanguage]);
+                $this->translationRepository->createOrUpdate(
+                    $item['namespace'],
+                    $item['group'],
+                    $item['default'],
+                    $chosenLanguage,
+                    $item[$chosenLanguage]
+                );
             }
         });
 
@@ -140,20 +131,21 @@ class TranslationService
     }
 
     /**
-     * @param $collectionFromImportedFile
-     * @param $existingTranslations
-     * @param $chosenLanguage
-     * @return mixed
+     * @param Collection<array<string, string>> $collectionFromImportedFile
+     * @param array<string, Translation> $existingTranslations
+     * @return Collection<array<string, string|bool>>
      */
-    public function getCollectionWithConflicts($collectionFromImportedFile, $existingTranslations, $chosenLanguage)
+    public function getCollectionWithConflicts(Collection $collectionFromImportedFile, array $existingTranslations, string $chosenLanguage): Collection
     {
-        return $collectionFromImportedFile->map(function ($row) use ($existingTranslations, $chosenLanguage) {
+        return $collectionFromImportedFile->map(function (array $row) use ($existingTranslations, $chosenLanguage) {
             $row['has_conflict'] = false;
+            $keyForArray = $this->buildKeyForArray($row);
             if (!$this->rowValueEqualsValueInArray($row, $existingTranslations, $chosenLanguage)) {
                 $row['has_conflict'] = true;
-                if (isset($existingTranslations[$this->buildKeyForArray($row)])) {
-                    if (isset($existingTranslations[$this->buildKeyForArray($row)]['text'][$chosenLanguage])) {
-                        $row['current_value'] = (string)$existingTranslations[$this->buildKeyForArray($row)]['text'][$chosenLanguage];
+
+                if (isset($existingTranslations[$keyForArray])) {
+                    if (isset($existingTranslations[$keyForArray]['text'][$chosenLanguage])) {
+                        $row['current_value'] = (string) $existingTranslations[$keyForArray]['text'][$chosenLanguage];
                     } else {
                         $row['has_conflict'] = false;
                         $row['current_value'] = '';
@@ -168,22 +160,21 @@ class TranslationService
     }
 
     /**
-     * @param $collectionWithConflicts
-     * @return mixed
+     * @param Collection<array<string, string|bool>> $collectionWithConflicts
      */
-    public function getNumberOfConflicts($collectionWithConflicts)
+    public function getNumberOfConflicts(Collection $collectionWithConflicts): int
     {
-        return $collectionWithConflicts->filter(static function ($row) {
+        return $collectionWithConflicts->filter(static function (array $row) {
             return $row['has_conflict'];
         })->count();
     }
 
     /**
-     * @param $collectionFromImportedFile
-     * @param $existingTranslations
-     * @return mixed
+     * @param Collection<array<string, string>> $collectionFromImportedFile
+     * @param array<string, Translation> $existingTranslations
+     * @return Collection<array<string, string>>
      */
-    public function getFilteredExistingTranslations($collectionFromImportedFile, $existingTranslations)
+    public function getFilteredExistingTranslations(Collection $collectionFromImportedFile, array $existingTranslations): Collection
     {
         return $collectionFromImportedFile->reject(function ($row) use ($existingTranslations) {
             // filter out rows representing translations existing in the database (treat deleted_at as non-existing)
@@ -191,12 +182,8 @@ class TranslationService
         });
     }
 
-    /**
-     * @param $collectionToImport
-     * @param $chosenLanguage
-     * @return bool
-     */
-    public function validImportFile($collectionToImport, $chosenLanguage): bool
+    /** @param Collection<array<string, string>> $collectionToImport */
+    public function validImportFile(Collection $collectionToImport, string $chosenLanguage): bool
     {
         $requiredHeaders = ['namespace', 'group', 'default', $chosenLanguage];
 
@@ -209,12 +196,8 @@ class TranslationService
         return true;
     }
 
-    /**
-     * @param $file
-     * @param $chosenLanguage
-     * @return mixed
-     */
-    public function getCollectionFromImportedFile($file, $chosenLanguage)
+    /** @return Collection<array<string, string>> */
+    public function getCollectionFromImportedFile(UploadedFile $file, string $chosenLanguage): Collection
     {
         if ($file->getClientOriginalExtension() !== 'xlsx') {
             abort(409, 'Unsupported file type');

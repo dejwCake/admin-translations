@@ -11,26 +11,20 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class TranslationsExport implements FromCollection, WithMapping, WithHeadings
 {
-    /**
-     * @var Collection
-     */
-    private $exportLanguages;
+    private Collection $exportLanguages;
 
     public function __construct($request)
     {
-        $this->exportLanguages = collect($request->exportLanguages);
+        $this->exportLanguages = new Collection($request->exportLanguages);
     }
 
-    /**
-     * @return Collection
-     */
-    public function collection()
+    public function collection(): Collection
     {
         return Translation::all();
     }
 
     /**
-     * @return array
+     * @return array<string>
      */
     public function headings(): array
     {
@@ -51,6 +45,7 @@ class TranslationsExport implements FromCollection, WithMapping, WithHeadings
     /**
      * @param Translation $translation
      * @return array
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     public function map($translation): array
     {
@@ -61,27 +56,25 @@ class TranslationsExport implements FromCollection, WithMapping, WithHeadings
             $translation->created_at,
         ];
 
-        $this->exportLanguages->each(function ($language) use (&$map, $translation) {
-            array_push($map, $this->getCurrentTransForTranslationLanguage($translation, $language));
+        $languages = $this->exportLanguages->map(function (string $language) use ($translation) {
+            return $this->getCurrentTransForTranslationLanguage($translation, $language);
         });
 
-        return $map;
+        return array_merge($map, $languages->toArray());
     }
 
-    /**
-     * @param Translation $translation
-     * @param string $language
-     * @return array|Translator|string|null
-     */
-    private function getCurrentTransForTranslationLanguage(Translation $translation, string $language)
+    private function getCurrentTransForTranslationLanguage(Translation $translation, string $language): array|string
     {
         if ($translation->group === '*') {
             return __($translation->key, [], $language);
         } elseif ($translation->namespace === '*') {
             return trans($translation->group . '.' . $translation->key, [], $language);
         } else {
-            return trans(stripslashes($translation->namespace) . '::' . $translation->group . '.' . $translation->key,
-                [], $language);
+            return trans(
+                stripslashes($translation->namespace) . '::' . $translation->group . '.' . $translation->key,
+                [],
+                $language
+            );
         }
     }
 }

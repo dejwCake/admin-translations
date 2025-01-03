@@ -6,8 +6,9 @@ use Brackets\AdminTranslations\Http\Requests\Admin\Translation\RescanTranslation
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Http\Response;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Artisan;
 
 class RescanTranslationsController extends BaseController
@@ -16,11 +17,8 @@ class RescanTranslationsController extends BaseController
 
     /**
      * Display a listing of the resource.
-     *
-     * @param RescanTranslations $request
-     * @return array|Response
      */
-    public function rescan(RescanTranslations $request)
+    public function rescan(RescanTranslations $request): array|Redirector|RedirectResponse
     {
         Artisan::call('admin-translations:scan-and-save');
 

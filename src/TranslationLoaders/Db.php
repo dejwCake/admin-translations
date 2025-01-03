@@ -10,11 +10,8 @@ class Db implements TranslationLoader
     /**
      * Returns all translations for the given locale and group.
      *
-     * @param string $locale
-     * @param string $group
-     * @param string $namespace
      * @throws InvalidConfiguration
-     * @return array
+     * @return array<string, string>
      */
     public function loadTranslations(string $locale, string $group, string $namespace): array
     {
@@ -31,7 +28,7 @@ class Db implements TranslationLoader
     {
         $modelClass = config('admin-translations.model');
 
-        if (! is_a(new $modelClass, Translation::class)) {
+        if (!is_a(new $modelClass, Translation::class)) {
             throw InvalidConfiguration::invalidModel($modelClass);
         }
 

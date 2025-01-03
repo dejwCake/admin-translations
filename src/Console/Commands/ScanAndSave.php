@@ -16,6 +16,7 @@ class ScanAndSave extends Command
      * The name and signature of the console command.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $name = 'admin-translations:scan-and-save';
 
@@ -23,6 +24,7 @@ class ScanAndSave extends Command
      * The console command description.
      *
      * @var string
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Scans all PHP files, extract translations and stores them into the database';
 
@@ -35,13 +37,11 @@ class ScanAndSave extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return void
      */
     public function handle(): void
     {
         $scanner = app(TranslationsScanner::class);
-        collect($this->argument('paths'))->each(function ($path) use ($scanner) {
+        (new Collection($this->argument('paths')))->each(function ($path) use ($scanner) {
             $scanner->addScannedPath($path);
         });
 
@@ -77,12 +77,7 @@ class ScanAndSave extends Command
         });
     }
 
-    /**
-     * @param $namespace
-     * @param $group
-     * @param $key
-     */
-    protected function createOrUpdate($namespace, $group, $key): void
+    protected function createOrUpdate(string $namespace, string $group, string $key): void
     {
         /** @var Translation $translation */
         $translation = Translation::withTrashed()
@@ -91,9 +86,9 @@ class ScanAndSave extends Command
             ->where('key', $key)
             ->first();
 
-        $defaultLocale = config('app.locale');
+        $defaultLocale = (string) config('app.locale');
 
-        if ($translation) {
+        if ($translation !== null) {
             if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
                 $translation->restore();
             }
@@ -111,12 +106,7 @@ class ScanAndSave extends Command
         }
     }
 
-    /**
-     * @param Translation $translation
-     * @param $locale
-     * @return bool
-     */
-    private function isCurrentTransForTranslationArray(Translation $translation, $locale): bool
+    private function isCurrentTransForTranslationArray(Translation $translation, string $locale): bool
     {
         if ($translation->group === '*') {
             return is_array(__($translation->key, [], $locale));

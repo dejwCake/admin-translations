@@ -2,28 +2,39 @@
 
 namespace Brackets\AdminTranslations;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Arr;
 
 /**
- * @property mixed namespace
- * @property mixed group
- * @property mixed key
- * @property array text
+ * @property string $namespace
+ * @property string $group
+ * @property string $key
+ * @property array $text
+ * @property Carbon $created_at
  */
 class Translation extends Model
 {
     use SoftDeletes;
 
-    /** @var array */
+    /**
+     * @var array
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
     public $translatable = ['text'];
 
-    /** @var array */
+    /**
+     * @var array<string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
     public $guarded = ['id'];
 
-    /** @var array */
+    /**
+     * @var array<string, string>
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+     */
     protected $casts = ['text' => 'array'];
 
     /**
@@ -43,10 +54,7 @@ class Translation extends Model
     }
 
     /**
-     * @param string $locale
-     * @param string $group
-     * @param string $namespace
-     * @return array
+     * @return array<string, string>
      */
     public static function getTranslationsForGroupAndNamespace(string $locale, string $group, string $namespace): array
     {
@@ -74,24 +82,12 @@ class Translation extends Model
             });
     }
 
-    /**
-     * @param string $namespace
-     * @param string $group
-     * @param string $locale
-     * @return string
-     */
     public static function getCacheKey(string $namespace, string $group, string $locale): string
     {
         return "brackets.admin-translations.{$namespace}.{$group}.{$locale}";
     }
 
-    /**
-     * @param string $locale
-     * @param null|string $group
-     *
-     * @return string
-     */
-    public function getTranslation(string $locale, string $group = null): string
+    public function getTranslation(string $locale, ?string $group = null): string
     {
         if ($group === '*' && !isset($this->text[$locale])) {
             $fallback = config('app.fallback_locale');
@@ -101,12 +97,6 @@ class Translation extends Model
         return $this->text[$locale] ?? '';
     }
 
-    /**
-     * @param string $locale
-     * @param string $value
-     *
-     * @return $this
-     */
     public function setTranslation(string $locale, string $value): self
     {
         $this->text = array_merge($this->text ?? [], [$locale => $value]);
@@ -120,13 +110,12 @@ class Translation extends Model
     protected function flushGroupCache(): void
     {
         foreach ($this->getTranslatedLocales() as $locale) {
-            Cache::forget(static::getCacheKey($this->namespace ?? '*', $this->group,
-                $locale));
+            Cache::forget(static::getCacheKey($this->namespace ?? '*', $this->group, $locale));
         }
     }
 
     /**
-     * @return array
+     * @return array<string>
      */
     protected function getTranslatedLocales(): array
     {

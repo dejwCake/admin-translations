@@ -6,14 +6,7 @@ use Brackets\AdminTranslations\Translation;
 
 class TranslationRepository
 {
-    /**
-     * @param $namespace
-     * @param $group
-     * @param $key
-     * @param $language
-     * @param $text
-     */
-    public function createOrUpdate($namespace, $group, $key, $language, $text): void
+    public function createOrUpdate(string $namespace, string $group, string $key, string $language, string $text): void
     {
         /** @var Translation $translation */
         $translation = Translation::withTrashed()
@@ -24,7 +17,7 @@ class TranslationRepository
 
         $defaultLocale = config('app.locale');
 
-        if ($translation) {
+        if ($translation !== null) {
             if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
                 $translation->restore();
             }
@@ -42,11 +35,6 @@ class TranslationRepository
         }
     }
 
-    /**
-     * @param Translation $translation
-     * @param string $locale
-     * @return bool
-     */
     protected function isCurrentTransForTranslationArray(Translation $translation, string $locale): bool
     {
         if ($translation->group === '*') {

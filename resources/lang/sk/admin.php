@@ -21,7 +21,8 @@ return [
 
     'import' => [
         'title' => 'Import prekladov',
-        'notice' => 'Môžeš importovať preklady vybraného jazyka z .xslx súboru. Importovaný súbor musí mať rovnakú štruktúru ako súbor vygenerovaný v exporte prekladov.',
+        'notice' => 'Môžeš importovať preklady vybraného jazyka z .xslx súboru. '
+            . 'Importovaný súbor musí mať rovnakú štruktúru ako súbor vygenerovaný v exporte prekladov.',
         'language_to_import' => 'Jazyk na importovanie',
         'do_not_override' => 'Neprepisovať existujúce preklady',
         'conflict_notice_we_have_found' => 'Našli sme',
@@ -36,7 +37,8 @@ return [
     'export' => [
         'notice' => 'Môžeš exportovať preklady vybraného jazyka ako .xslx súbor.',
         'language_to_export' => 'Jazyk na importovanie',
-        'export_reference_language' => 'Exportovať povôdný jazyk - užitočné ak chceš vidieť preklad v pôvodnom jazyku v rozdielnom stĺpci, preklady si môžeš jednoducho porovnať.',
+        'export_reference_language' => 'Exportovať povôdný jazyk - užitočné ak chceš vidieť preklad v pôvodnom jazyku '
+            . 'v rozdielnom stĺpci, preklady si môžeš jednoducho porovnať.',
         'reference_langauge' => 'Pôvodný jazyk'
     ],
 

@@ -3,6 +3,7 @@
 namespace Brackets\AdminTranslations;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Symfony\Component\Finder\SplFileInfo;
 
 /*
@@ -15,34 +16,17 @@ use Symfony\Component\Finder\SplFileInfo;
 class TranslationsScanner
 {
     /**
-     * The Filesystem instance.
-     *
-     * @var Filesystem
-     */
-    private $disk;
-
-    /**
      * The paths to directories where we look for localised strings to scan.
      *
-     * @var array
      */
-    private $scannedPaths;
+    private Collection $scannedPaths;
 
-    /**
-     * Manager constructor.
-     *
-     * @param Filesystem $disk
-     */
-    public function __construct(Filesystem $disk)
+    public function __construct(private Filesystem $disk)
     {
-        $this->disk = $disk;
-        $this->scannedPaths = collect([]);
+        $this->scannedPaths = new Collection([]);
     }
 
-    /**
-     * @param $path
-     */
-    public function addScannedPath($path): void
+    public function addScannedPath(string $path): void
     {
         $this->scannedPaths->push($path);
     }
@@ -52,7 +36,7 @@ class TranslationsScanner
      *
      * e.g. ['users.blade.php' => ['users.name'], 'users/index.blade.php' => ['users.phone', 'users.city']]
      *
-     * @return array
+     * @return array<Collection>
      */
     public function getAllViewFilesWithTranslations(): array
     {
@@ -122,8 +106,8 @@ class TranslationsScanner
             '[\)]'  // Close parentheses or new parameter
         ;
 
-        $trans = collect();
-        $__ = collect();
+        $trans = new Collection();
+        $__ = new Collection();
 
         // FIXME maybe we can count how many times one translation is used and eventually display it to the user
 

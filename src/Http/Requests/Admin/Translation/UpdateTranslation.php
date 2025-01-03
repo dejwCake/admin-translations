@@ -2,15 +2,17 @@
 
 namespace Brackets\AdminTranslations\Http\Requests\Admin\Translation;
 
+use Brackets\AdminTranslations\Translation;
 use Brackets\Translatable\TranslatableFormRequest;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * @property Translation $translation
+ */
 class UpdateTranslation extends TranslatableFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -19,30 +21,23 @@ class UpdateTranslation extends TranslatableFormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @param mixed $locale
-     * @return array
      */
-    public function translatableRules($locale): array
+    public function translatableRules(string $locale): array
     {
         return [
             'text' => 'string|nullable',
+            'importLanguage' => 'string|nullable',
+            'resolvedTranslations' => 'array|nullable',
         ];
     }
 
-    /**
-     * @return string
-     */
     public function getChosenLanguage(): string
     {
-        return strtolower($this->importLanguage);
+        return strtolower($this->validated('importLanguage'));
     }
 
-    /**
-     * @return mixed
-     */
-    public function getResolvedConflicts()
+    public function getResolvedConflicts(): array
     {
-        return $this->resolvedTranslations;
+        return $this->validated('resolvedTranslations');
     }
 }

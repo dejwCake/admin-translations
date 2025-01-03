@@ -4,6 +4,7 @@ namespace Brackets\AdminTranslations\Tests\Feature;
 
 use Brackets\AdminTranslations\Tests\TestCase;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
 class RescanTranslationsControllerTest extends TestCase
@@ -26,18 +27,19 @@ class RescanTranslationsControllerTest extends TestCase
         ;
     }
 
-    protected function authorizedToRescan()
+    protected function authorizedToRescan(): void
     {
         $this->authorizedTo(['index', 'rescan']);
     }
 
-    private function authorizedTo($actions)
+    /** @param array<string> $actions */
+    private function authorizedTo(array $actions): void
     {
         $this->actingAs(new User, 'admin');
         Gate::define('admin', function () {
             return true;
         });
-        collect((array) $actions)->each(function ($action) {
+        (new Collection($actions))->each(function ($action) {
             Gate::define('admin.translation.'.$action, function () {
                 return true;
             });

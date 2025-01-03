@@ -10,29 +10,28 @@ use Illuminate\Translation\Translator;
 
 class DbLanguageLineTest extends TestCase
 {
-    /** @var \Brackets\AdminTranslations\Translation */
     protected Translation $languageLine;
 
-    public function testItCanGetATranslationForTheCurrentAppLocale()
+    public function testItCanGetATranslationForTheCurrentAppLocale(): void
     {
         self::assertEquals('english', trans('group.key'));
     }
 
-    public function testItCanGetACorrectTranslationAfterTheLocaleHasBeenChanged()
+    public function testItCanGetACorrectTranslationAfterTheLocaleHasBeenChanged(): void
     {
         app()->setLocale('nl');
 
         self::assertEquals('nederlands', trans('group.key'));
     }
 
-    public function testItCanReturnTheGroupAndTheKeyWhenGettingANonExistingTranslation()
+    public function testItCanReturnTheGroupAndTheKeyWhenGettingANonExistingTranslation(): void
     {
         app()->setLocale('nl');
 
         self::assertEquals('group.unknown', trans('group.unknown'));
     }
 
-    public function testItSupportsPlaceholders()
+    public function testItSupportsPlaceholders(): void
     {
         $this->createTranslation('*', 'group', 'placeholder', ['en' => 'text with :placeholder']);
 
@@ -42,7 +41,7 @@ class DbLanguageLineTest extends TestCase
         );
     }
 
-    public function testItWillCacheAllTranslations()
+    public function testItWillCacheAllTranslations(): void
     {
         trans('group.key');
 
@@ -51,10 +50,10 @@ class DbLanguageLineTest extends TestCase
 
         trans('group.key');
 
-        self::assertEquals($queryCount, count(DB::getQueryLog()));
+        self::assertCount($queryCount, DB::getQueryLog());
     }
 
-    public function testItFlushesTheCacheWhenATranslationHasBeenCreated()
+    public function testItFlushesTheCacheWhenATranslationHasBeenCreated(): void
     {
         self::assertEquals('group.new', trans('group.new'));
 
@@ -64,7 +63,7 @@ class DbLanguageLineTest extends TestCase
         self::assertEquals('created', trans('group.new'));
     }
 
-    public function testItFlushesTheCacheWhenATranslationHasBeenUpdated()
+    public function testItFlushesTheCacheWhenATranslationHasBeenUpdated(): void
     {
         trans('group.key');
 
@@ -76,7 +75,7 @@ class DbLanguageLineTest extends TestCase
         self::assertEquals('updated', trans('group.key'));
     }
 
-    public function testItFlushesTheCacheWhenATranslationHasBeenDeleted()
+    public function testItFlushesTheCacheWhenATranslationHasBeenDeleted(): void
     {
         self::assertEquals('english', trans('group.key'));
 
@@ -86,7 +85,7 @@ class DbLanguageLineTest extends TestCase
         self::assertEquals('group.key', trans('group.key'));
     }
 
-    public function testItCanWorkWithACustomModel()
+    public function testItCanWorkWithACustomModel(): void
     {
         $alternativeModel = new class extends Translation {
             public static function getTranslationsForGroupAndNamespace(string $locale, string $group, string $namespace): array
@@ -100,7 +99,7 @@ class DbLanguageLineTest extends TestCase
         self::assertEquals('alternative class', trans('group.key'));
     }
 
-    public function testItWillThrowAnExceptionIfTheConfiguredModelDoesNotExtendTheDefaultOne()
+    public function testItWillThrowAnExceptionIfTheConfiguredModelDoesNotExtendTheDefaultOne(): void
     {
         $invalidModel = new class {
         };
@@ -112,7 +111,7 @@ class DbLanguageLineTest extends TestCase
         self::assertEquals('alternative class', trans('group.key'));
     }
 
-    protected function flushIlluminateTranslatorCache()
+    protected function flushIlluminateTranslatorCache(): void
     {
         $loader = $this->app['translation.loader'];
 

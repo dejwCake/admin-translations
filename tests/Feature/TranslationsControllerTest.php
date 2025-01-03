@@ -5,6 +5,7 @@ namespace Brackets\AdminTranslations\Tests\Feature;
 use Brackets\AdminTranslations\Tests\TestCase;
 use Brackets\AdminTranslations\Translation;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 
 class TranslationsControllerTest extends TestCase
@@ -23,7 +24,7 @@ class TranslationsControllerTest extends TestCase
             ->assertSee('some.key')
             ->assertSee('1 English version')
 ////            ->assertDontSee('1 Slovak version') // it is there, but it's only in JS source object, not visible on page, but we're gonna skip this assertion
-            ->assertViewHas('locales', collect(['en', 'sk']))
+            ->assertViewHas('locales', new Collection(['en', 'sk']))
             ;
 
         self::assertCount(3, Translation::all());
@@ -96,17 +97,17 @@ class TranslationsControllerTest extends TestCase
         self::assertArrayNotHasKey('en', $line->fresh()->text);
     }
 
-    protected function authorizedToIndex()
+    protected function authorizedToIndex(): void
     {
         $this->authorizedTo('index');
     }
 
-    protected function authorizedToUpdate()
+    protected function authorizedToUpdate(): void
     {
         $this->authorizedTo('edit');
     }
 
-    private function authorizedTo($action)
+    private function authorizedTo(string $action): void
     {
         $this->actingAs(new User, 'admin');
         Gate::define('admin', function () {

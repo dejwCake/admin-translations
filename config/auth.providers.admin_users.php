@@ -1,6 +1,8 @@
 <?php
 
+use App\Models\User;
+
 return [
     'driver' => 'eloquent',
-    'model' => App\Models\User::class,
+    'model' => User::class,
 ];

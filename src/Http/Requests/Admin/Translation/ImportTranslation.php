@@ -9,8 +9,6 @@ class ImportTranslation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
-     *
-     * @return bool
      */
     public function authorize(): bool
     {
@@ -19,20 +17,18 @@ class ImportTranslation extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array
      */
     public function rules(): array
     {
         return [
-            'importLanguage' => 'string|required',
-            'onlyMissing' => 'string',
-            'fileImport' => 'required|file',
+            'importLanguage' => ['string', 'required'],
+            'onlyMissing' => ['string'],
+            'fileImport' => ['required', 'file'],
         ];
     }
 
-    public function getChosenLanguage()
+    public function getChosenLanguage(): string
     {
-        return strtolower($this->importLanguage);
+        return strtolower($this->validated('importLanguage'));
     }
 }
