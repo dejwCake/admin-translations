@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Providers;
 
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Translation\TranslationServiceProvider as IlluminateTranslationServiceProvider;
 
-class TranslationServiceProvider extends IlluminateTranslationServiceProvider
+class TranslationServiceProvider extends IlluminateTranslationServiceProvider implements DeferrableProvider
 {
     /**
      * Register the translation line loader. This method registers a

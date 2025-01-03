@@ -32,6 +32,7 @@ class TransLanguageLineTest extends TestCase
 
     public function testByDefaultItWillPreferADbTranslationOverAFileTranslation(): void
     {
+        dd(config('app.providers'), app()->getLoadedProviders(), app()->get('translator'));
         $this->createTranslation('*', 'file', 'key', ['en' => 'en value from db']);
         $this->createTranslation('*', 'file', '404.title', ['en' => 'page not found from db']);
 

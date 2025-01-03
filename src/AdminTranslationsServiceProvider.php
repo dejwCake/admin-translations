@@ -66,7 +66,7 @@ class AdminTranslationsServiceProvider extends ServiceProvider
             }
         }
 
-        $this->app->register(TranslationServiceProvider::class);
+        $this->app->registerDeferredProvider(TranslationServiceProvider::class);
 
         // provider auto-discovery has limits - in tests we have to explicitly register providers
         if ($this->app->runningUnitTests()) {
