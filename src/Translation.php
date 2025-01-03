@@ -20,7 +20,7 @@ class Translation extends Model
     use SoftDeletes;
 
     /**
-     * @var array
+     * @var array<string>
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     public $translatable = ['text'];

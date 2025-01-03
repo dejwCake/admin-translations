@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 
 class TranslationsScannerTest extends TestCase
 {
-    private $viewsDir = __DIR__ . '/../../fixtures/views';
+    private string $viewsDir = __DIR__ . '/../../fixtures/views';
 
     public function testCollectingTranslations()
     {

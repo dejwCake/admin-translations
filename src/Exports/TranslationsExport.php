@@ -2,6 +2,7 @@
 
 namespace Brackets\AdminTranslations\Exports;
 
+use Brackets\AdminTranslations\Http\Requests\Admin\Translation\UpdateTranslation;
 use Brackets\AdminTranslations\Translation;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Support\Collection;
@@ -13,7 +14,7 @@ class TranslationsExport implements FromCollection, WithMapping, WithHeadings
 {
     private Collection $exportLanguages;
 
-    public function __construct($request)
+    public function __construct(UpdateTranslation $request)
     {
         $this->exportLanguages = new Collection($request->exportLanguages);
     }

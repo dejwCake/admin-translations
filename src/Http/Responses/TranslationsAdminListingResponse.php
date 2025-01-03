@@ -21,6 +21,8 @@ class TranslationsAdminListingResponse implements Responsable
     /**
      * @param $request
      * @return array|Factory|Response|View|\Symfony\Component\HttpFoundation\Response
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingAnyTypeHint
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      */
     public function toResponse($request)
     {

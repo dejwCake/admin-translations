@@ -7,7 +7,7 @@ use Illuminate\Support\Arr;
 
 class TransLanguageLineTest extends TestCase
 {
-    protected $nested = [
+    protected array $nested = [
         'bool' => [
             1 => 'Yes',
             0 => 'No',

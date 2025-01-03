@@ -19,6 +19,7 @@ class Handler extends ExceptionHandler
      * A list of the exception types that should not be reported.
      *
      * @var array
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $dontReport = [
         AuthenticationException::class,
@@ -37,7 +38,7 @@ class Handler extends ExceptionHandler
      * @throws Throwable
      * @return void
      */
-    public function report(Throwable $e)
+    public function report(Throwable $e): void
     {
         parent::report($e);
     }
@@ -46,8 +47,10 @@ class Handler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param Request $request
-     * @throws Throwable
      * @return Response
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
+     * @throws Throwable
      */
     public function render($request, Throwable $e)
     {
@@ -60,6 +63,9 @@ class Handler extends ExceptionHandler
      * @param Request $request
      * @param AuthenticationException $exception
      * @return Response
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
     protected function unauthenticated($request, AuthenticationException $exception)
     {
