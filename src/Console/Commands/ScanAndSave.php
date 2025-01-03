@@ -41,11 +41,11 @@ class ScanAndSave extends Command
             $scanner->addScannedPath($path);
         });
 
-        [$trans, $__] = $scanner->getAllViewFilesWithTranslations();
+        [$trans, $underscore] = $scanner->getAllViewFilesWithTranslations();
         assert($trans instanceof Collection);
-        assert($__ instanceof Collection);
+        assert($underscore instanceof Collection);
 
-        DB::transaction(function () use ($trans, $__): void {
+        DB::transaction(function () use ($trans, $underscore): void {
             Translation::query()
                 ->whereNull('deleted_at')
                 ->update([
@@ -64,11 +64,11 @@ class ScanAndSave extends Command
                 $this->createOrUpdate($namespace, $group, $key);
             });
 
-            $__->each(function ($default): void {
+            $underscore->each(function ($default): void {
                 $this->createOrUpdate('*', '*', $default);
             });
 
-            $this->info(($trans->count() + $__->count()) . ' translations saved');
+            $this->info(($trans->count() + $underscore->count()) . ' translations saved');
         });
     }
 

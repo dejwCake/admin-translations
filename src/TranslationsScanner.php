@@ -142,7 +142,7 @@ class TranslationsScanner
         ;
 
         $trans = new Collection();
-        $__ = new Collection();
+        $underscore = new Collection();
 
         // FIXME maybe we can count how many times one translation is used and eventually display it to the user
 
@@ -153,14 +153,14 @@ class TranslationsScanner
             }
 
             if (preg_match_all("/$patternB/siU", $fileContent, $matches)) {
-                $__->push($matches[2]);
+                $underscore->push($matches[2]);
             }
 
             if (preg_match_all("/$patternC/siU", $fileContent, $matches)) {
-                $__->push($matches[2]);
+                $underscore->push($matches[2]);
             }
         }
 
-        return [$trans->flatten()->unique(), $__->flatten()->unique()];
+        return [$trans->flatten()->unique(), $underscore->flatten()->unique()];
     }
 }
