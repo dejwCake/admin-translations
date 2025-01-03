@@ -1,10 +1,10 @@
 <?php
 
-namespace Brackets\AdminTranslations\Test;
+namespace Brackets\AdminTranslations\Tests;
 
 use Brackets\AdminAuth\AdminAuthServiceProvider;
 use Brackets\AdminTranslations\AdminTranslationsServiceProvider;
-use Brackets\AdminTranslations\Test\Exceptions\Handler;
+use Brackets\AdminTranslations\Tests\Exceptions\Handler;
 use Brackets\AdminTranslations\Translation;
 use Brackets\Translatable\TranslatableServiceProvider;
 use Exception;

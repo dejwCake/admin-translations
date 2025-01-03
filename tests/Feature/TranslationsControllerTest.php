@@ -1,8 +1,8 @@
 <?php
 
-namespace Brackets\AdminTranslations\Test\Feature;
+namespace Brackets\AdminTranslations\Tests\Feature;
 
-use Brackets\AdminTranslations\Test\TestCase;
+use Brackets\AdminTranslations\Tests\TestCase;
 use Brackets\AdminTranslations\Translation;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Gate;
@@ -10,8 +10,7 @@ use Illuminate\Support\Facades\Gate;
 class TranslationsControllerTest extends TestCase
 {
 
-    /** @test */
-    public function authorized_user_can_see_translations_stored_in_database()
+    public function testAuthorizedUserCanSeeTranslationsStoredInDatabase()
     {
         $this->authorizedToIndex();
 
@@ -27,12 +26,12 @@ class TranslationsControllerTest extends TestCase
             ->assertViewHas('locales', collect(['en', 'sk']))
             ;
 
-        $this->assertCount(3, Translation::all());
+        self::assertCount(3, Translation::all());
     }
 
-    ///** @test */
-    public function authorized_user_can_search_for_translations()
+    public function testAuthorizedUserCanSearchForTranslations()
     {
+        self::markTestSkipped('This test has not been implemented yet.');
         $this->authorizedToIndex();
 
         $this->createTranslation('*', 'admin', 'Default version', ['en' => '1English version', 'sk' => '1Slovak version']);
@@ -45,8 +44,7 @@ class TranslationsControllerTest extends TestCase
         ;
     }
 
-    /** @test */
-    public function authorized_user_can_filter_by_group()
+    public function testAuthorizedUserCanFilterByGroup()
     {
         $this->authorizedToIndex();
 
@@ -60,8 +58,7 @@ class TranslationsControllerTest extends TestCase
         ;
     }
 
-    /** @test */
-    public function not_authorized_user_cannot_see_or_update_anything()
+    public function testNotAuthorizedUserCannotSeeOrUpdateAnything()
     {
         $this->actingAs(new User, 'admin');
         Gate::define('admin', function () {
@@ -78,8 +75,7 @@ class TranslationsControllerTest extends TestCase
     }
 
 
-    /** @test */
-    public function authorized_user_can_update_a_translation()
+    public function testAuthorizedUserCanUpdateATranslation()
     {
         $this->authorizedToUpdate();
 
@@ -96,8 +92,8 @@ class TranslationsControllerTest extends TestCase
             ->assertJson([])
         ;
 
-        $this->assertEquals('1 Slovak changed version', $line->fresh()->text['sk']);
-        $this->assertArrayNotHasKey('en', $line->fresh()->text);
+        self::assertEquals('1 Slovak changed version', $line->fresh()->text['sk']);
+        self::assertArrayNotHasKey('en', $line->fresh()->text);
     }
 
     protected function authorizedToIndex()

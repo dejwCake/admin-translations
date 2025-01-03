@@ -1,16 +1,15 @@
 <?php
 
-namespace Brackets\AdminTranslations\Test\Feature;
+namespace Brackets\AdminTranslations\Tests\Feature;
 
-use Brackets\AdminTranslations\Test\TestCase;
+use Brackets\AdminTranslations\Tests\TestCase;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Gate;
 
 class RescanTranslationsControllerTest extends TestCase
 {
 
-    /** @test */
-    public function rescan_fills_up_translations_table()
+    public function testRescanFillsUpTranslationsTable()
     {
         $this->authorizedToRescan();
 

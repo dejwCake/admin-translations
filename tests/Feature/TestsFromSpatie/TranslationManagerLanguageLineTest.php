@@ -1,22 +1,20 @@
 <?php
 
-namespace Brackets\AdminTranslations\Test\Feature\TestsFromSpatie;
+namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie;
 
-use Brackets\AdminTranslations\Test\TestCase;
+use Brackets\AdminTranslations\Tests\TestCase;
 use Brackets\AdminTranslations\TranslationLoaders\Db;
 
 class TranslationManagerLanguageLineTest extends TestCase
 {
-    /** @test */
-    public function it_will_not_use_database_translations_if_the_provider_is_not_configured()
+    public function testItWillNotUseDatabaseTranslationsIfTheProviderIsNotConfigured()
     {
         $this->app['config']->set('admin-translations.translation_loaders', []);
 
-        $this->assertEquals('group.key', trans('group.key'));
+        self::assertEquals('group.key', trans('group.key'));
     }
 
-    /** @test */
-    public function it_will_merge_translation_from_all_providers()
+    public function testItWillMergeTranslationFromAllProviders()
     {
         $this->app['config']->set('admin-translations.translation_loaders', [
             Db::class,
@@ -25,7 +23,7 @@ class TranslationManagerLanguageLineTest extends TestCase
 
         $this->createTranslation('*', 'db', 'key', ['en' => 'db']);
 
-        $this->assertEquals('db', trans('db.key'));
-        $this->assertEquals('this is dummy', trans('dummy.dummy'));
+        self::assertEquals('db', trans('db.key'));
+        self::assertEquals('this is dummy', trans('dummy.dummy'));
     }
 }

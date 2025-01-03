@@ -1,6 +1,6 @@
 <?php
 
-namespace Brackets\AdminTranslations\Test\Exceptions;
+namespace Brackets\AdminTranslations\Tests\Exceptions;
 
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -12,6 +12,7 @@ use Illuminate\Http\Response;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -34,25 +35,23 @@ class Handler extends ExceptionHandler
      *
      * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
      *
-     * @param \Exception $exception
      * @throws Exception
      * @return void
      */
-    public function report(Exception $exception)
+    public function report(Throwable $e)
     {
-        parent::report($exception);
+        parent::report($e);
     }
 
     /**
      * Render an exception into an HTTP response.
      *
      * @param Request $request
-     * @param \Exception $exception
      * @return Response
      */
-    public function render($request, Exception $exception)
+    public function render($request, Throwable $e)
     {
-        return parent::render($request, $exception);
+        return parent::render($request, $e);
     }
 
     /**

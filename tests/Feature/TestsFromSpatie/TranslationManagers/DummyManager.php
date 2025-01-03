@@ -1,6 +1,6 @@
 <?php
 
-namespace Brackets\AdminTranslations\Test\Feature\TestsFromSpatie\TranslationManagers;
+namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie\TranslationManagers;
 
 use Brackets\AdminTranslations\TranslationLoaderManager;
 

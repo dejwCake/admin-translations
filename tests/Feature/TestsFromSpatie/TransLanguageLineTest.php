@@ -1,8 +1,8 @@
 <?php
 
-namespace Brackets\AdminTranslations\Test\Feature\TestsFromSpatie;
+namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie;
 
-use Brackets\AdminTranslations\Test\TestCase;
+use Brackets\AdminTranslations\Tests\TestCase;
 use Illuminate\Support\Arr;
 
 class TransLanguageLineTest extends TestCase
@@ -14,54 +14,48 @@ class TransLanguageLineTest extends TestCase
         ],
     ];
 
-    /** @test */
-    public function it_can_get_translations_for_language_files()
+    public function testItCanGetTranslationsForLanguageFiles()
     {
-        $this->assertEquals('en value', trans('file.key'));
-        $this->assertEquals('page not found', trans('file.404.title'));
+        self::assertEquals('en value', trans('file.key'));
+        self::assertEquals('page not found', trans('file.404.title'));
     }
 
-    /** @test */
-    public function it_can_get_translations_for_language_files_for_the_current_locale()
+    public function testItCanGetTranslationsForLanguageFilesForTheCurrentLocale()
     {
         app()->setLocale('nl');
 
-        $this->assertEquals('nl value', trans('file.key'));
-        $this->assertEquals('pagina niet gevonden', trans('file.404.title'));
+        self::assertEquals('nl value', trans('file.key'));
+        self::assertEquals('pagina niet gevonden', trans('file.404.title'));
     }
 
-    /** @test */
-    public function by_default_it_will_prefer_a_db_translation_over_a_file_translation()
+    public function testByDefaultItWillPreferADbTranslationOverAFileTranslation()
     {
         $this->createTranslation('*', 'file', 'key', ['en' => 'en value from db']);
         $this->createTranslation('*', 'file', '404.title', ['en' => 'page not found from db']);
 
-        $this->assertEquals('en value from db', trans('file.key'));
-        $this->assertEquals('page not found from db', trans('file.404.title'));
+        self::assertEquals('en value from db', trans('file.key'));
+        self::assertEquals('page not found from db', trans('file.404.title'));
     }
 
-    /** @test */
-    public function it_will_return_array_if_the_given_translation_is_nested()
+    public function testItWillReturnArrayIfTheGivenTranslationIsNested()
     {
         foreach (Arr::dot($this->nested) as $key => $text) {
             $this->createTranslation('*', 'nested', $key, ['en' => $text]);
         }
 
-        $this->assertEqualsCanonicalizing($this->nested['bool'], trans('nested.bool'), $delta = 0.0, $maxDepth = 10, $canonicalize = true);
+        self::assertEqualsCanonicalizing($this->nested['bool'], trans('nested.bool'), $delta = 0.0, $maxDepth = 10, $canonicalize = true);
     }
 
-    /** @test */
-    public function it_will_return_the_translation_string_if_max_nested_level_is_reached()
+    public function testItWillReturnTheTranslationStringIfMaxNestedLevelIsReached()
     {
         foreach (Arr::dot($this->nested) as $key => $text) {
             $this->createTranslation('*', 'nested', $key, ['en' => $text]);
         }
 
-        $this->assertEquals($this->nested['bool'][1], trans('nested.bool.1'));
+        self::assertEquals($this->nested['bool'][1], trans('nested.bool.1'));
     }
 
-    /** @test */
-    public function it_will_return_the_dotted_translation_key_if_no_translation_found()
+    public function testItWillReturnTheDottedTranslationKeyIfNoTranslationFound()
     {
         $notFoundKey = 'nested.bool.3';
 
@@ -69,16 +63,15 @@ class TransLanguageLineTest extends TestCase
             $this->createTranslation('*', 'nested', $key, ['en' => $text]);
         }
 
-        $this->assertEquals($notFoundKey, trans($notFoundKey));
+        self::assertEquals($notFoundKey, trans($notFoundKey));
     }
 
-    /** @test */
-    public function it_can_use_namespace_in_translations()
+    public function testItCanUseNamespaceInTranslations()
     {
         $this->createTranslation('foo', 'file', 'key', ['en' => 'en value from db']);
         $this->createTranslation('foo/bar', 'file', '404.title', ['en' => 'page not found from db']);
 
-        $this->assertEquals('en value from db', trans('foo::file.key'));
-        $this->assertEquals('page not found from db', trans('foo/bar::file.404.title'));
+        self::assertEquals('en value from db', trans('foo::file.key'));
+        self::assertEquals('page not found from db', trans('foo/bar::file.404.title'));
     }
 }

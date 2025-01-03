@@ -1,21 +1,20 @@
 <?php
 
-namespace Brackets\AdminTranslations\Test\Unit\Scanner;
+namespace Brackets\AdminTranslations\Tests\Unit\Scanner;
 
-use Brackets\AdminTranslations\Test\TestCase;
+use Brackets\AdminTranslations\Tests\TestCase;
 use Brackets\AdminTranslations\TranslationsScanner;
 
 class TranslationsScannerTest extends TestCase
 {
     private $viewsDir = __DIR__ . '/../../fixtures/views';
 
-    /** @test */
-    public function testing()
+    public function testCollectingTranslations()
     {
         $scanner = app(TranslationsScanner::class);
         $scanner->addScannedPath($this->viewsDir);
 
-        $this->assertEquals([
+        self::assertEquals([
             collect([
                 "good.key1",
                 "good.key2",

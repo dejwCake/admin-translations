@@ -1,39 +1,36 @@
 <?php
 
-namespace Brackets\AdminTranslations\Test\Feature\TestsFromSpatie;
+namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie;
 
-use Brackets\AdminTranslations\Test\TestCase;
+use Brackets\AdminTranslations\Tests\TestCase;
 use Brackets\AdminTranslations\Translation;
 
 class LanguageLineLanguageLineTest extends TestCase
 {
-    /** @test */
-    public function it_can_get_a_translation()
+    public function testItCanGetATranslation()
     {
         $languageLine = $this->createTranslation('*', 'group', 'new', ['en' => 'english', 'nl' => 'nederlands']);
 
-        $this->assertEquals('english', $languageLine->getTranslation('en'));
-        $this->assertEquals('nederlands', $languageLine->getTranslation('nl'));
+        self::assertEquals('english', $languageLine->getTranslation('en'));
+        self::assertEquals('nederlands', $languageLine->getTranslation('nl'));
     }
 
-    /** @test */
-    public function it_can_set_a_translation()
+    public function testItCanSetATranslation()
     {
         $languageLine = $this->createTranslation('*', 'group', 'new', ['en' => 'english']);
 
         $languageLine->setTranslation('nl', 'nederlands');
 
-        $this->assertEquals('english', $languageLine->getTranslation('en'));
-        $this->assertEquals('nederlands', $languageLine->getTranslation('nl'));
+        self::assertEquals('english', $languageLine->getTranslation('en'));
+        self::assertEquals('nederlands', $languageLine->getTranslation('nl'));
     }
 
-    /** @test */
-    public function it_can_set_a_translation_on_a_fresh_model()
+    public function testItCanSetATranslationOnAFreshModel()
     {
         $languageLine = new Translation();
 
         $languageLine->setTranslation('nl', 'nederlands');
 
-        $this->assertEquals('nederlands', $languageLine->getTranslation('nl'));
+        self::assertEquals('nederlands', $languageLine->getTranslation('nl'));
     }
 }

@@ -1,9 +1,9 @@
 <?php
 
-namespace Brackets\AdminTranslations\Test\Feature\TestsFromSpatie;
+namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie;
 
-use Brackets\AdminTranslations\Test\Feature\TestsFromSpatie\TranslationManagers\DummyManager;
-use Brackets\AdminTranslations\Test\TestCase;
+use Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie\TranslationManagers\DummyManager;
+use Brackets\AdminTranslations\Tests\TestCase;
 use Illuminate\Foundation\Application;
 
 class DummyManagerTest extends TestCase
@@ -17,22 +17,19 @@ class DummyManagerTest extends TestCase
         $app['config']->set('admin-translations.translation_manager', DummyManager::class);
     }
 
-    /** @test */
-    public function it_allow_to_change_translation_manager()
+    public function testItAllowToChangeTranslationManager()
     {
-        $this->assertInstanceOf(DummyManager::class, $this->app['translation.loader']);
+        self::assertInstanceOf(DummyManager::class, $this->app['translation.loader']);
     }
 
-    /** @test */
-    public function it_can_translate_using_dummy_manager_using_file()
+    public function testItCanTranslateUsingDummyManagerUsingFile()
     {
-        $this->assertEquals('en value', trans('file.key'));
+        self::assertEquals('en value', trans('file.key'));
     }
 
-    /** @test */
-    public function it_can_translate_using_dummy_manager_using_db()
+    public function testItCanTranslateUsingDummyManagerUsingDb()
     {
         $this->createTranslation('*', 'file', 'key', ['en' => 'en value from db']);
-        $this->assertEquals('en value from db', trans('file.key'));
+        self::assertEquals('en value from db', trans('file.key'));
     }
 }
