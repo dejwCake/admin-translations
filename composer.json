@@ -46,10 +46,10 @@
     },
     "require-dev": {
         "doctrine/dbal": "^4.2",
+        "larastan/larastan": "^2.9",
         "mockery/mockery": "^1.6",
         "orchestra/testbench": "^9.9",
-        "phpunit/phpunit": "^11.5",
-        "larastan/larastan": "^2.9"
+        "phpunit/phpunit": "^11.5"
     },
     "autoload": {
         "psr-4": {
