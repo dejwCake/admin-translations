@@ -48,9 +48,6 @@ class TransLanguageLineTest extends TestCase
         self::assertEqualsCanonicalizing(
             $this->nested['bool'],
             trans('nested.bool'),
-            $delta = 0.0,
-            $maxDepth = 10,
-            $canonicalize = true,
         );
     }
 

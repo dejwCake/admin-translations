@@ -96,7 +96,7 @@ class DbLanguageLineTest extends TestCase
             public static function getTranslationsForGroupAndNamespace(
                 string $locale,
                 string $group,
-                string $namespace,
+                ?string $namespace,
             ): array {
                 return ['key' => 'alternative class'];
             }

@@ -58,7 +58,7 @@ class Translation extends Model
     /**
      * @return array<string, string>
      */
-    public static function getTranslationsForGroupAndNamespace(string $locale, string $group, string $namespace): array
+    public static function getTranslationsForGroupAndNamespace(string $locale, string $group, ?string $namespace): array
     {
         if ($namespace === '' || $namespace === null) {
             $namespace = '*';

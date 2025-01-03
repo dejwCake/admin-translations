@@ -7,6 +7,7 @@ namespace Brackets\AdminTranslations;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Symfony\Component\Finder\SplFileInfo;
+use function assert;
 
 /*
  * This class is a fork from themsaid/laravel-langman and adjusted to our purpose.
@@ -145,17 +146,17 @@ class TranslationsScanner
 
         // FIXME maybe we can count how many times one translation is used and eventually display it to the user
 
-        foreach ($this->disk->allFiles($this->scannedPaths->toArray()) as $file) {
-            \assert($file instanceof SplFileInfo);
-            if (preg_match_all("/$patternA/siU", $file->getContents(), $matches)) {
+        foreach ($this->scannedPaths->toArray() as $filePath) {
+            $fileContent = $this->disk->get($filePath);
+            if (preg_match_all("/$patternA/siU", $fileContent, $matches)) {
                 $trans->push($matches[2]);
             }
 
-            if (preg_match_all("/$patternB/siU", $file->getContents(), $matches)) {
+            if (preg_match_all("/$patternB/siU", $fileContent, $matches)) {
                 $__->push($matches[2]);
             }
 
-            if (preg_match_all("/$patternC/siU", $file->getContents(), $matches)) {
+            if (preg_match_all("/$patternC/siU", $fileContent, $matches)) {
                 $__->push($matches[2]);
             }
         }

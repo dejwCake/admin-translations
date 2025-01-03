@@ -1,2 +1,81 @@
 parameters:
 	ignoreErrors:
+		-
+			message: "#^Class App\\\\Models\\\\User not found\\.$#"
+			count: 1
+			path: config/auth.providers.admin_users.php
+
+		-
+			message: "#^Out of 129 possible param types, only 109 \\- 84\\.4 %% actually have it\\. Add more param types to get over 99 %%$#"
+			count: 3
+			path: src/Console/Commands/ScanAndSave.php
+
+		-
+			message: "#^Out of 129 possible param types, only 109 \\- 84\\.4 %% actually have it\\. Add more param types to get over 99 %%$#"
+			count: 2
+			path: src/Exports/TranslationsExport.php
+
+		-
+			message: "#^Out of 114 possible return types, only 111 \\- 97\\.3 %% actually have it\\. Add more return types to get over 99 %%$#"
+			count: 1
+			path: src/Http/Responses/TranslationsAdminListingResponse.php
+
+		-
+			message: "#^Out of 129 possible param types, only 109 \\- 84\\.4 %% actually have it\\. Add more param types to get over 99 %%$#"
+			count: 1
+			path: src/Http/Responses/TranslationsAdminListingResponse.php
+
+		-
+			message: "#^Out of 129 possible param types, only 109 \\- 84\\.4 %% actually have it\\. Add more param types to get over 99 %%$#"
+			count: 1
+			path: src/Providers/TranslationServiceProvider.php
+
+		-
+			message: "#^Out of 129 possible param types, only 109 \\- 84\\.4 %% actually have it\\. Add more param types to get over 99 %%$#"
+			count: 3
+			path: src/Service/Import/TranslationService.php
+
+		-
+			message: "#^Out of 129 possible param types, only 109 \\- 84\\.4 %% actually have it\\. Add more param types to get over 99 %%$#"
+			count: 1
+			path: src/Translation.php
+
+		-
+			message: "#^Out of 14 possible property types, only 13 \\- 92\\.8 %% actually have it\\. Add more property types to get over 99 %%$#"
+			count: 1
+			path: src/Translation.php
+
+		-
+			message: "#^Out of 129 possible param types, only 109 \\- 84\\.4 %% actually have it\\. Add more param types to get over 99 %%$#"
+			count: 3
+			path: src/TranslationLoaderManager.php
+
+		-
+			message: "#^Out of 114 possible return types, only 111 \\- 97\\.3 %% actually have it\\. Add more return types to get over 99 %%$#"
+			count: 2
+			path: tests/Exceptions/Handler.php
+
+		-
+			message: "#^Out of 129 possible param types, only 109 \\- 84\\.4 %% actually have it\\. Add more param types to get over 99 %%$#"
+			count: 2
+			path: tests/Exceptions/Handler.php
+
+		-
+			message: "#^Out of 129 possible param types, only 109 \\- 84\\.4 %% actually have it\\. Add more param types to get over 99 %%$#"
+			count: 1
+			path: tests/Feature/RescanTranslationsControllerTest.php
+
+		-
+			message: "#^Out of 129 possible param types, only 109 \\- 84\\.4 %% actually have it\\. Add more param types to get over 99 %%$#"
+			count: 1
+			path: tests/Feature/TestsFromSpatie/DummyManagerTest.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: tests/Feature/TranslationsControllerTest.php
+
+		-
+			message: "#^Out of 129 possible param types, only 109 \\- 84\\.4 %% actually have it\\. Add more param types to get over 99 %%$#"
+			count: 2
+			path: tests/TestCase.php

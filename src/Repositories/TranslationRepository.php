@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminTranslations\Repositories;
 
 use Brackets\AdminTranslations\Translation;
+use function assert;
 
 class TranslationRepository
 {
@@ -15,21 +16,20 @@ class TranslationRepository
             ->where('group', $group)
             ->where('key', $key)
             ->first();
-        \assert($translation instanceof Translation);
 
         $defaultLocale = config('app.locale');
 
         if ($translation !== null) {
+            assert($translation instanceof Translation);
             if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
                 $translation->restore();
             }
         } else {
-            $translation = Translation::make([
-                'namespace' => $namespace,
-                'group' => $group,
-                'key' => $key,
-                'text' => [$language => $text],
-            ]);
+            $translation = new Translation();
+            $translation->namespace = $namespace;
+            $translation->group = $group;
+            $translation->key = $key;
+            $translation->text = [$language => $text];
 
             if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
                 $translation->save();

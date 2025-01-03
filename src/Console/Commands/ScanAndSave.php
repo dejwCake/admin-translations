@@ -11,6 +11,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Console\Input\InputArgument;
+use function assert;
 
 class ScanAndSave extends Command
 {
@@ -87,21 +88,20 @@ class ScanAndSave extends Command
             ->where('group', $group)
             ->where('key', $key)
             ->first();
-        \assert($translation instanceof Translation);
 
         $defaultLocale = (string) config('app.locale');
 
         if ($translation !== null) {
+            assert($translation instanceof Translation);
             if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
                 $translation->restore();
             }
         } else {
-            $translation = Translation::make([
-                'namespace' => $namespace,
-                'group' => $group,
-                'key' => $key,
-                'text' => [],
-            ]);
+            $translation = new Translation();
+            $translation->namespace = $namespace;
+            $translation->group = $group;
+            $translation->key = $key;
+            $translation->text = [];
 
             if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
                 $translation->save();
