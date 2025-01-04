@@ -49,11 +49,20 @@ class AdminTranslationsInstall extends Command
 
         $this->strReplaceInFile(
             resource_path('views/admin/layout/sidebar.blade.php'),
-            '|url\(\'admin\/translations\'\)|',
             '{{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
             //phpcs:ignore SlevomatCodingStandard.Files.LineLength.LineTooLong
             '<li class="nav-item"><a class="nav-link" href="{{ url(\'admin/translations\') }}"><i class="nav-icon icon-location-pin"></i> {{ __(\'Translations\') }}</a></li>
             {{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
+            '|url\(\'admin\/translations\'\)|',
+        );
+
+        $this->strReplaceInFile(
+            config_path('app.php'),
+            '\'providers\' => ServiceProvider::defaultProviders()->merge([',
+            '\'providers\' => ServiceProvider::defaultProviders()->replace([
+        \Illuminate\Translation\TranslationServiceProvider::class => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,
+    ])->merge([',
+            '|\'providers\' => ServiceProvider::defaultProviders\(\)->merge\(\[|',
         );
 
         $this->call('migrate');
@@ -62,17 +71,17 @@ class AdminTranslationsInstall extends Command
     }
 
     private function strReplaceInFile(
-        string $fileName,
-        string $ifExistsRegex,
+        string $filePath,
         string $find,
         string $replaceWith,
+        ?string $ifRegexNotExists = null,
     ): bool|int {
-        $content = File::get($fileName);
-        if (preg_match($ifExistsRegex, $content)) {
+        $content = File::get($filePath);
+        if ($ifRegexNotExists !== null && preg_match($ifRegexNotExists, $content)) {
             return false;
         }
 
-        return File::put($fileName, str_replace($find, $replaceWith, $content));
+        return File::put($filePath, str_replace($find, $replaceWith, $content));
     }
 
     /**
@@ -83,10 +92,10 @@ class AdminTranslationsInstall extends Command
         // webpack
         $this->strReplaceInFile(
             'webpack.mix.js',
-            '|vendor/brackets/admin-translations|',
             '// Do not delete this comment, it\'s used for auto-generation :)',
             'path.resolve(__dirname, \'vendor/brackets/admin-translations/resources/assets/js\'),
 				// Do not delete this comment, it\'s used for auto-generation :)',
+            '|vendor/brackets/admin-translations|',
         );
 
         $this->info('Admin Translation assets registered');

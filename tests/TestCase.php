@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminTranslations\Tests;
 
 use Brackets\AdminTranslations\AdminTranslationsServiceProvider;
+use Brackets\AdminTranslations\Providers\TranslationServiceProvider;
 use Brackets\AdminTranslations\Translation;
 use Brackets\Translatable\Models\WithTranslations;
 use Brackets\Translatable\TranslatableServiceProvider;
@@ -14,6 +15,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Translation\TranslationServiceProvider as IlluminateTranslationServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
@@ -44,6 +46,18 @@ abstract class TestCase extends Orchestra
         $this->languageLine = $this->createTranslation('*', 'group', 'key', ['en' => 'english', 'nl' => 'nederlands']);
 
         File::copyDirectory(__DIR__ . '/fixtures/resources/views', resource_path('views'));
+    }
+
+    /**
+     * @param Application $app
+     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function overrideApplicationProviders($app): array
+    {
+        return [
+            IlluminateTranslationServiceProvider::class => TranslationServiceProvider::class,
+        ];
     }
 
     /**

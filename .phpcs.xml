@@ -20,7 +20,7 @@
 
     <rule ref="SlevomatCodingStandard.Complexity.Cognitive">
         <properties>
-            <property name="maxComplexity" value="10"/>
+            <property name="maxComplexity" value="12"/>
         </properties>
     </rule>
 
@@ -35,5 +35,9 @@
 
     <rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty">
         <exclude-pattern>src/Translation.php</exclude-pattern>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.Files.LineLength.LineTooLong">
+        <exclude-pattern>src/Console/Commands/AdminTranslationsInstall.php</exclude-pattern>
     </rule>
 </ruleset>

@@ -6,7 +6,6 @@ namespace Brackets\AdminTranslations;
 
 use Brackets\AdminTranslations\Console\Commands\AdminTranslationsInstall;
 use Brackets\AdminTranslations\Console\Commands\ScanAndSave;
-use Brackets\AdminTranslations\Providers\TranslationServiceProvider;
 use Brackets\AdminUI\AdminUIServiceProvider;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Route;
@@ -65,8 +64,6 @@ class AdminTranslationsServiceProvider extends ServiceProvider
                     ->group(__DIR__ . '/../routes/web.php');
             }
         }
-
-        $this->app->registerDeferredProvider(TranslationServiceProvider::class);
 
         // provider auto-discovery has limits - in tests we have to explicitly register providers
         if ($this->app->runningUnitTests()) {

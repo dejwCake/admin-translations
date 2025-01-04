@@ -29,9 +29,8 @@ class DummyManagerTest extends TestCase
         self::assertEquals('en value from db', trans('file.key'));
     }
 
-    private function forceDummy(): void {
-        app()->singleton('translation.loader', static function ($app) {
-            return new DummyManager($app['files'], $app['path.lang']);
-        });
+    private function forceDummy(): void
+    {
+        app()->singleton('translation.loader', static fn ($app) => new DummyManager($app['files'], $app['path.lang']));
     }
 }
