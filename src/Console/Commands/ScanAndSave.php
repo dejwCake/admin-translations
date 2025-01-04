@@ -6,7 +6,7 @@ namespace Brackets\AdminTranslations\Console\Commands;
 
 use Brackets\AdminTranslations\Translation;
 use Brackets\AdminTranslations\TranslationsScanner;
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -50,7 +50,7 @@ class ScanAndSave extends Command
             Translation::query()
                 ->whereNull('deleted_at')
                 ->update([
-                    'deleted_at' => Carbon::now(),
+                    'deleted_at' => CarbonImmutable::now(),
                 ]);
 
             $trans->each(function ($trans): void {

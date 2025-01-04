@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Cache;
  * @property string $group
  * @property string $key
  * @property array $text
- * @property Carbon $created_at
+ * @property CarbonInterface $created_at
  */
 class Translation extends Model
 {

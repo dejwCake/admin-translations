@@ -12,7 +12,7 @@ use Brackets\AdminTranslations\Http\Requests\Admin\Translation\UpdateTranslation
 use Brackets\AdminTranslations\Http\Responses\TranslationsAdminListingResponse;
 use Brackets\AdminTranslations\Service\Import\TranslationService;
 use Brackets\AdminTranslations\Translation;
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Exception;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Database\Eloquent\Builder;
@@ -79,7 +79,7 @@ class TranslationsController extends BaseController
 
     public function export(UpdateTranslation $request): BinaryFileResponse
     {
-        $currentTime = Carbon::now()->toDateTimeString();
+        $currentTime = CarbonImmutable::now()->toDateTimeString();
         $nameOfExportedFile = 'translations' . $currentTime . '.xlsx';
 
         return Excel::download(new TranslationsExport($request), $nameOfExportedFile);
