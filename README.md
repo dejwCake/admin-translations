@@ -16,7 +16,7 @@ You can find full documentation at https://docs.getcraftable.com/#/admin-transla
 To run tests use this docker environment.
 
 ```shell
-  docker-compose run -it test vendor/bin/phpunit
+  docker compose run -it --rm test vendor/bin/phpunit
 ```
 
 To switch between postgresql and mariadb change in `docker-compose.yml` DB_CONNECTION environmental variable:
