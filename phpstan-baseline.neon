@@ -6,12 +6,12 @@ parameters:
 			path: config/auth.providers.admin_users.php
 
 		-
-			message: "#^Out of 130 possible param types, only 109 \\- 83\\.8 %% actually have it\\. Add more param types to get over 99 %%$#"
+			message: "#^Out of 131 possible param types, only 110 \\- 83\\.9 %% actually have it\\. Add more param types to get over 99 %%$#"
 			count: 3
 			path: src/Console/Commands/ScanAndSave.php
 
 		-
-			message: "#^Out of 130 possible param types, only 109 \\- 83\\.8 %% actually have it\\. Add more param types to get over 99 %%$#"
+			message: "#^Out of 131 possible param types, only 110 \\- 83\\.9 %% actually have it\\. Add more param types to get over 99 %%$#"
 			count: 2
 			path: src/Exports/TranslationsExport.php
 
@@ -21,22 +21,22 @@ parameters:
 			path: src/Http/Responses/TranslationsAdminListingResponse.php
 
 		-
-			message: "#^Out of 130 possible param types, only 109 \\- 83\\.8 %% actually have it\\. Add more param types to get over 99 %%$#"
+			message: "#^Out of 131 possible param types, only 110 \\- 83\\.9 %% actually have it\\. Add more param types to get over 99 %%$#"
 			count: 1
 			path: src/Http/Responses/TranslationsAdminListingResponse.php
 
 		-
-			message: "#^Out of 130 possible param types, only 109 \\- 83\\.8 %% actually have it\\. Add more param types to get over 99 %%$#"
+			message: "#^Out of 131 possible param types, only 110 \\- 83\\.9 %% actually have it\\. Add more param types to get over 99 %%$#"
 			count: 1
 			path: src/Providers/TranslationServiceProvider.php
 
 		-
-			message: "#^Out of 130 possible param types, only 109 \\- 83\\.8 %% actually have it\\. Add more param types to get over 99 %%$#"
+			message: "#^Out of 131 possible param types, only 110 \\- 83\\.9 %% actually have it\\. Add more param types to get over 99 %%$#"
 			count: 3
 			path: src/Service/Import/TranslationService.php
 
 		-
-			message: "#^Out of 130 possible param types, only 109 \\- 83\\.8 %% actually have it\\. Add more param types to get over 99 %%$#"
+			message: "#^Out of 131 possible param types, only 110 \\- 83\\.9 %% actually have it\\. Add more param types to get over 99 %%$#"
 			count: 1
 			path: src/Translation.php
 
@@ -46,7 +46,7 @@ parameters:
 			path: src/Translation.php
 
 		-
-			message: "#^Out of 130 possible param types, only 109 \\- 83\\.8 %% actually have it\\. Add more param types to get over 99 %%$#"
+			message: "#^Out of 131 possible param types, only 110 \\- 83\\.9 %% actually have it\\. Add more param types to get over 99 %%$#"
 			count: 3
 			path: src/TranslationLoaderManager.php
 
@@ -56,17 +56,17 @@ parameters:
 			path: tests/Exceptions/Handler.php
 
 		-
-			message: "#^Out of 130 possible param types, only 109 \\- 83\\.8 %% actually have it\\. Add more param types to get over 99 %%$#"
+			message: "#^Out of 131 possible param types, only 110 \\- 83\\.9 %% actually have it\\. Add more param types to get over 99 %%$#"
 			count: 2
 			path: tests/Exceptions/Handler.php
 
 		-
-			message: "#^Out of 130 possible param types, only 109 \\- 83\\.8 %% actually have it\\. Add more param types to get over 99 %%$#"
+			message: "#^Out of 131 possible param types, only 110 \\- 83\\.9 %% actually have it\\. Add more param types to get over 99 %%$#"
 			count: 1
 			path: tests/Feature/RescanTranslationsControllerTest.php
 
 		-
-			message: "#^Out of 130 possible param types, only 109 \\- 83\\.8 %% actually have it\\. Add more param types to get over 99 %%$#"
+			message: "#^Out of 131 possible param types, only 110 \\- 83\\.9 %% actually have it\\. Add more param types to get over 99 %%$#"
 			count: 1
 			path: tests/Feature/TestsFromSpatie/DummyManagerTest.php
 
@@ -76,6 +76,6 @@ parameters:
 			path: tests/Feature/TranslationsControllerTest.php
 
 		-
-			message: "#^Out of 130 possible param types, only 109 \\- 83\\.8 %% actually have it\\. Add more param types to get over 99 %%$#"
+			message: "#^Out of 131 possible param types, only 110 \\- 83\\.9 %% actually have it\\. Add more param types to get over 99 %%$#"
 			count: 3
 			path: tests/TestCase.php

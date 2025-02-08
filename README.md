@@ -10,6 +10,13 @@ This packages is part of [Craftable](https://github.com/BRACKETS-by-TRIAD/crafta
 
 You can find full documentation at https://docs.getcraftable.com/#/admin-translations
 
+## Composer
+
+To develop this package, you need to have composer installed. To run composer command use:
+
+```shell
+  docker compose run -it --rm test composer update
+```
 
 ## Run tests
 
