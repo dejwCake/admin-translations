@@ -13,9 +13,6 @@ use Illuminate\Support\ServiceProvider;
 
 class AdminTranslationsServiceProvider extends ServiceProvider
 {
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         $this->commands([
@@ -42,9 +39,6 @@ class AdminTranslationsServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/admin-translations.php', 'admin-translations');
