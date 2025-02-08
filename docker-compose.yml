@@ -26,7 +26,7 @@ services:
       MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-bestsecret}"
 
   php-qa:
-    image: dejwcake/phpqa8.4:1
+    image: dejwcake/phpqa8.4:2
     volumes:
       - .:/var/www/html:delegated
 

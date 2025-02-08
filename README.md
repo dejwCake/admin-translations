@@ -13,21 +13,23 @@ You can find full documentation at https://docs.getcraftable.com/#/admin-transla
 ## Composer
 
 To develop this package, you need to have composer installed. To run composer command use:
-
 ```shell
   docker compose run -it --rm test composer update
+```
+
+For composer normalization:
+```shell
+  docker compose run -it --rm php-qa composer normalize
 ```
 
 ## Run tests
 
 To run tests use this docker environment.
-
 ```shell
   docker compose run -it --rm test vendor/bin/phpunit -d pcov.enabled=1
 ```
 
 To switch between postgresql and mariadb change in `docker-compose.yml` DB_CONNECTION environmental variable:
-
 ```git
 - DB_CONNECTION: pgsql
 + DB_CONNECTION: mysql
@@ -36,11 +38,6 @@ To switch between postgresql and mariadb change in `docker-compose.yml` DB_CONNE
 ## Run code analysis tools
 
 To be sure, that your code is clean, you can run code analysis tools. To do this, run:
-
-For composer normalization:
-```shell
-  docker compose run -it --rm php-qa composer normalize
-```
 
 For php compatibility:
 ```shell
@@ -53,7 +50,6 @@ For code style:
 ```
 
 or to fix issues:
-
 ```shell
   docker compose run -it --rm php-qa phpcbf -s --colors --extensions=php
 ```

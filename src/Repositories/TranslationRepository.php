@@ -6,8 +6,6 @@ namespace Brackets\AdminTranslations\Repositories;
 
 use Brackets\AdminTranslations\Translation;
 
-use function assert;
-
 class TranslationRepository
 {
     public function createOrUpdate(string $namespace, string $group, string $key, string $language, string $text): void
@@ -21,7 +19,6 @@ class TranslationRepository
         $defaultLocale = config('app.locale');
 
         if ($translation !== null) {
-            assert($translation instanceof Translation);
             if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
                 $translation->restore();
             }

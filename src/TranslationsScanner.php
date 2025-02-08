@@ -6,7 +6,6 @@ namespace Brackets\AdminTranslations;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
-use Symfony\Component\Finder\SplFileInfo;
 
 /*
  * This class is a fork from themsaid/laravel-langman and adjusted to our purpose.
@@ -147,7 +146,6 @@ class TranslationsScanner
 
         foreach ($this->scannedPaths->toArray() as $dirPath) {
             foreach ($this->disk->allFiles($dirPath) as $file) {
-                assert($file instanceof SplFileInfo);
                 if (preg_match_all("/$patternA/siU", $file->getContents(), $matches)) {
                     $trans->push($matches[2]);
                 }

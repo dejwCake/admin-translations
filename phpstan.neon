@@ -6,6 +6,11 @@ parameters:
     level: 5
     phpVersion: 80200
     reportUnmatchedIgnoredErrors: false
+    type_coverage:
+        return: 75
+        param: 75
+        property: 75
+        constant: 75
 
     tmpDir: .phpstan.cache
 

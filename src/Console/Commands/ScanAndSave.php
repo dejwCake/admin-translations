@@ -12,8 +12,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\Console\Input\InputArgument;
 
-use function assert;
-
 class ScanAndSave extends Command
 {
     /**
@@ -43,8 +41,6 @@ class ScanAndSave extends Command
         });
 
         [$trans, $underscore] = $scanner->getAllViewFilesWithTranslations();
-        assert($trans instanceof Collection);
-        assert($underscore instanceof Collection);
 
         DB::transaction(function () use ($trans, $underscore): void {
             Translation::query()
@@ -93,7 +89,6 @@ class ScanAndSave extends Command
         $defaultLocale = (string) config('app.locale');
 
         if ($translation !== null) {
-            assert($translation instanceof Translation);
             if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
                 $translation->restore();
             }

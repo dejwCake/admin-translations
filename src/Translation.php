@@ -79,7 +79,7 @@ class Translation extends Model
                             }
 
                             return $translations;
-                        }) ?? [],
+                        }, []),
         );
     }
 
