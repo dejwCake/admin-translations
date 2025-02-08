@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminTranslations\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
+use Illuminate\Filesystem\Filesystem;
 
 class AdminTranslationsInstall extends Command
 {
@@ -24,6 +24,11 @@ class AdminTranslationsInstall extends Command
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
      */
     protected $description = 'Install a brackets/admin-translations package';
+
+    public function __construct(private readonly Filesystem $filesystem)
+    {
+        parent::__construct();
+    }
 
     /**
      * Execute the console command.
@@ -76,12 +81,12 @@ class AdminTranslationsInstall extends Command
         string $replaceWith,
         ?string $ifRegexNotExists = null,
     ): bool|int {
-        $content = File::get($filePath);
+        $content = $this->filesystem->get($filePath);
         if ($ifRegexNotExists !== null && preg_match($ifRegexNotExists, $content)) {
             return false;
         }
 
-        return File::put($filePath, str_replace($find, $replaceWith, $content));
+        return $this->filesystem->put($filePath, str_replace($find, $replaceWith, $content));
     }
 
     /**
