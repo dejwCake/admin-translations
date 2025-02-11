@@ -50,8 +50,6 @@ class AdminTranslationsInstall extends Command
             '--tag' => 'config',
         ]);
 
-        $this->frontendAdjustments();
-
         $this->strReplaceInFile(
             resource_path('views/admin/layout/sidebar.blade.php'),
             '{{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
@@ -68,6 +66,16 @@ class AdminTranslationsInstall extends Command
         \Illuminate\Translation\TranslationServiceProvider::class => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,
     ])->merge([',
             '|\'providers\' => ServiceProvider::defaultProviders\(\)->merge\(\[|',
+        );
+
+        $this->strReplaceInFile(
+            base_path('bootstrap/providers.php'),
+            '];',
+            '\'providers\' => ServiceProvider::defaultProviders()->replace([
+        \Illuminate\Translation\TranslationServiceProvider::class => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,
+    ])->toArray(),
+    ];',
+            '|\'providers\'',
         );
 
         $this->call('migrate');
@@ -87,22 +95,5 @@ class AdminTranslationsInstall extends Command
         }
 
         return $this->filesystem->put($filePath, str_replace($find, $replaceWith, $content));
-    }
-
-    /**
-     * Add admin translations assets to webpack mix
-     */
-    private function frontendAdjustments(): void
-    {
-        // webpack
-        $this->strReplaceInFile(
-            'webpack.mix.js',
-            '// Do not delete this comment, it\'s used for auto-generation :)',
-            'path.resolve(__dirname, \'vendor/brackets/admin-translations/resources/assets/js\'),
-				// Do not delete this comment, it\'s used for auto-generation :)',
-            '|vendor/brackets/admin-translations|',
-        );
-
-        $this->info('Admin Translation assets registered');
     }
 }
