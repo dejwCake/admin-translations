@@ -75,7 +75,7 @@ class AdminTranslationsInstall extends Command
         \Illuminate\Translation\TranslationServiceProvider::class => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,
     ])->toArray(),
     ];',
-            '|\'providers\'',
+            '|\'providers\'|',
         );
 
         $this->call('migrate');
