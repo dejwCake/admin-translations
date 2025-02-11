@@ -71,10 +71,10 @@ class AdminTranslationsInstall extends Command
         $this->strReplaceInFile(
             config_path('app.php'),
             '];',
-            '\'providers\' => \Illuminate\Support\ServiceProvider::defaultProviders()->replace([
+            '   \'providers\' => \Illuminate\Support\ServiceProvider::defaultProviders()->replace([
         \Illuminate\Translation\TranslationServiceProvider::class => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,
     ])->toArray(),
-    ];',
+];',
             '|\'providers\'|',
         );
 
