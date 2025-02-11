@@ -65,13 +65,13 @@ class AdminTranslationsInstall extends Command
             '\'providers\' => ServiceProvider::defaultProviders()->replace([
         \Illuminate\Translation\TranslationServiceProvider::class => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,
     ])->merge([',
-            '|\'providers\' => ServiceProvider::defaultProviders\(\)->merge\(\[|',
+            '|TranslationServiceProvider::class|',
         );
 
         $this->strReplaceInFile(
-            base_path('bootstrap/providers.php'),
+            config_path('app.php'),
             '];',
-            '\'providers\' => ServiceProvider::defaultProviders()->replace([
+            '\'providers\' => \Illuminate\Support\ServiceProvider::defaultProviders()->replace([
         \Illuminate\Translation\TranslationServiceProvider::class => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,
     ])->toArray(),
     ];',
