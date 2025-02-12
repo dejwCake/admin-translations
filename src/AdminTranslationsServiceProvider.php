@@ -20,7 +20,7 @@ class AdminTranslationsServiceProvider extends ServiceProvider
             AdminTranslationsInstall::class,
         ]);
 
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'brackets/admin-translations');
+        $this->loadTranslationsFrom(__DIR__ . '/../lang', 'brackets/admin-translations');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'brackets/admin-translations');
 
         if ($this->app->runningInConsole()) {
@@ -52,10 +52,10 @@ class AdminTranslationsServiceProvider extends ServiceProvider
         if (config('admin-translations.use_routes', true)) {
             if (app(Router::class)->hasMiddlewareGroup('admin')) {
                 Route::middleware(['web', 'admin'])
-                    ->group(__DIR__ . '/../routes/web.php');
+                    ->group(__DIR__ . '/../routes/admin.php');
             } else {
                 Route::middleware(['web'])
-                    ->group(__DIR__ . '/../routes/web.php');
+                    ->group(__DIR__ . '/../routes/admin.php');
             }
         }
 
