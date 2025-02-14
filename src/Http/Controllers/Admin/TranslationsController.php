@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Http\Controllers\Admin;
 
-use Brackets\AdminListing\AdminListing;
+use Brackets\AdminListing\Services\AdminListingService;
 use Brackets\AdminTranslations\Exports\TranslationsExport;
 use Brackets\AdminTranslations\Http\Requests\Admin\Translation\ImportTranslation;
 use Brackets\AdminTranslations\Http\Requests\Admin\Translation\IndexTranslation;
@@ -46,7 +46,7 @@ class TranslationsController extends BaseController
     {
 
         // create and AdminListing instance for a specific model and
-        $data = AdminListing::create(Translation::class)->processRequestAndGet(
+        $data = AdminListingService::create(Translation::class)->processRequestAndGet(
         // pass the request with params
             $request,
             // set columns to query
