@@ -23,6 +23,17 @@ class UpdateTranslation extends TranslatableFormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     */
+    public function untranslatableRules(): array
+    {
+        return [
+            'importLanguage' => ['string', 'nullable'],
+            'resolvedTranslations' => ['array', 'nullable'],
+        ];
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
@@ -30,8 +41,6 @@ class UpdateTranslation extends TranslatableFormRequest
     {
         return [
             'text' => ['string', 'nullable'],
-            'importLanguage' => ['string', 'nullable'],
-            'resolvedTranslations' => ['array', 'nullable'],
         ];
     }
 

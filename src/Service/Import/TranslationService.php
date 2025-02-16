@@ -218,7 +218,8 @@ class TranslationService
         }
 
         try {
-            $collectionFromImportedFile = (new TranslationsImport())->toCollection($file)->first();
+            $collectionFromImportedFile = (new TranslationsImport())->toCollection($file)
+                ->first()->map(static fn (Collection $row) => $row->toArray());
 
             if (!$this->validImportFile($collectionFromImportedFile, $chosenLanguage)) {
                 abort(409, 'Wrong syntax in your import');
