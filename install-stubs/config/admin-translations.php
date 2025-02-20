@@ -37,5 +37,4 @@ return [
         resource_path('views'),
         // here you can add your own directories
     ],
-
 ];
