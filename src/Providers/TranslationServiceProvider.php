@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Providers;
 
+use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Translation\TranslationServiceProvider as IlluminateTranslationServiceProvider;
 
@@ -17,7 +18,8 @@ class TranslationServiceProvider extends IlluminateTranslationServiceProvider im
     protected function registerLoader(): void
     {
         $this->app->singleton('translation.loader', static function ($app) {
-            $class = config('admin-translations.translation_manager');
+            $config = $app->get(Config::class);
+            $class = $config->get('admin-translations.translation_manager');
 
             return new $class($app['files'], $app['path.lang']);
         });

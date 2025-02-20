@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Brackets\AdminTranslations\Translation;
+use Brackets\AdminTranslations\Models\Translation;
 use Brackets\AdminTranslations\TranslationLoaderManager;
-use Brackets\AdminTranslations\TranslationLoaders\Db;
+use Brackets\AdminTranslations\TranslationLoaders\DbTranslationLoader;
 
 return [
 
@@ -13,7 +13,7 @@ return [
      * the Brackets\AdminTranslations\TranslationLoaders\TranslationLoader-interface.
      */
     'translation_loaders' => [
-        Db::class,
+        DbTranslationLoader::class,
     ],
 
     /*

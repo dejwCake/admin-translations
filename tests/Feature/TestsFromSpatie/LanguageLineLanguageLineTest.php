@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie;
 
+use Brackets\AdminTranslations\Models\Translation;
 use Brackets\AdminTranslations\Tests\TestCase;
-use Brackets\AdminTranslations\Translation;
 
 class LanguageLineLanguageLineTest extends TestCase
 {

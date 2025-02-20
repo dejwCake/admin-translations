@@ -7,7 +7,7 @@ namespace Brackets\AdminTranslations\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class AdminTranslationsInstall extends Command
+final class AdminTranslationsInstall extends Command
 {
     /**
      * The name and signature of the console command.
@@ -25,7 +25,7 @@ class AdminTranslationsInstall extends Command
      */
     protected $description = 'Install a brackets/admin-translations package';
 
-    public function __construct(private readonly Filesystem $filesystem)
+    public function __construct(public readonly Filesystem $filesystem)
     {
         parent::__construct();
     }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Http\Requests\Admin\Translation;
 
-use Brackets\AdminTranslations\Translation;
-use Brackets\Translatable\TranslatableFormRequest;
-use Illuminate\Support\Facades\Gate;
+use Brackets\AdminTranslations\Models\Translation;
+use Brackets\Translatable\Http\Requests\TranslatableFormRequest;
+use Illuminate\Contracts\Auth\Access\Gate;
 
 /**
  * @property Translation $translation
@@ -16,9 +16,9 @@ class UpdateTranslation extends TranslatableFormRequest
     /**
      * Determine if the user is authorized to make this request.
      */
-    public function authorize(): bool
+    public function authorize(Gate $gate): bool
     {
-        return Gate::allows('admin.translation.edit', [$this->translation]);
+        return $gate->allows('admin.translation.edit', [$this->translation]);
     }
 
     /**

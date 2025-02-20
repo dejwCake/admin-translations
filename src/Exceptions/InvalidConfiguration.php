@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Exceptions;
 
-use Brackets\AdminTranslations\Translation;
+use Brackets\AdminTranslations\Models\Translation;
 use Exception;
 
 class InvalidConfiguration extends Exception

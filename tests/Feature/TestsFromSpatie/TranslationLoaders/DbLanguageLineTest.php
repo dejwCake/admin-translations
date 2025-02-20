@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie\TranslationLoaders;
 
 use Brackets\AdminTranslations\Exceptions\InvalidConfiguration;
+use Brackets\AdminTranslations\Models\Translation;
 use Brackets\AdminTranslations\Tests\TestCase;
-use Brackets\AdminTranslations\Translation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Translation\Translator;
 

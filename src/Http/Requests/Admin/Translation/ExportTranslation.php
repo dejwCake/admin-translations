@@ -6,8 +6,9 @@ namespace Brackets\AdminTranslations\Http\Requests\Admin\Translation;
 
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Collection;
 
-class ImportTranslation extends FormRequest
+class ExportTranslation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,19 +24,16 @@ class ImportTranslation extends FormRequest
     public function rules(): array
     {
         return [
-            'importLanguage' => ['string', 'required'],
-            'onlyMissing' => ['string'],
-            'fileImport' => ['required', 'file'],
+            'exportLanguages' => ['required', 'array'],
         ];
     }
 
-    public function getChosenLanguage(): string
+    /**
+     * @return Collection<string>
+     */
+    public function getExportLanguages(): Collection
     {
-        return strtolower($this->validated('importLanguage'));
-    }
-
-    public function getOnlyMissing(): bool
-    {
-        return $this->validated('onlyMissing') === 'true';
+        return (new Collection($this->validated('exportLanguages')))
+            ->map(static fn (string $language): string => strtolower($language));
     }
 }

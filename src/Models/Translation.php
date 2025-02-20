@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminTranslations;
+namespace Brackets\AdminTranslations\Models;
 
 use Carbon\CarbonInterface;
+use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * @property string $namespace
@@ -21,11 +22,8 @@ class Translation extends Model
 {
     use SoftDeletes;
 
-    /**
-     * @var array<string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    public $translatable = ['text'];
+    /** @var array<string> */
+    public array $translatable = ['text'];
 
     /**
      * @var array<string>
@@ -63,8 +61,9 @@ class Translation extends Model
         if ($namespace === '' || $namespace === null) {
             $namespace = '*';
         }
+        $cache = app(Cache::class);
 
-        return Cache::rememberForever(
+        return $cache->rememberForever(
             static::getCacheKey($namespace, $group, $locale),
             static fn () => static::query()
                         ->where('namespace', $namespace)
@@ -90,8 +89,11 @@ class Translation extends Model
 
     public function getTranslation(string $locale, ?string $group = null): string
     {
+        $config = app(Config::class);
+        assert($config instanceof Config);
+
         if ($group === '*' && !isset($this->text[$locale])) {
-            $fallback = config('app.fallback_locale');
+            $fallback = $config->get('app.fallback_locale');
 
             return $this->text[$fallback] ?? $this->key;
         }
@@ -111,8 +113,11 @@ class Translation extends Model
      */
     protected function flushGroupCache(): void
     {
+        $cache = app(Cache::class);
+        assert($cache instanceof Cache);
+
         foreach ($this->getTranslatedLocales() as $locale) {
-            Cache::forget(static::getCacheKey($this->namespace ?? '*', $this->group, $locale));
+            $cache->forget(static::getCacheKey($this->namespace ?? '*', $this->group, $locale));
         }
     }
 

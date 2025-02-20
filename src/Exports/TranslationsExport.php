@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Exports;
 
-use Brackets\AdminTranslations\Http\Requests\Admin\Translation\UpdateTranslation;
-use Brackets\AdminTranslations\Translation;
+use Brackets\AdminTranslations\Models\Translation;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -13,11 +12,8 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class TranslationsExport implements FromCollection, WithMapping, WithHeadings
 {
-    private Collection $exportLanguages;
-
-    public function __construct(UpdateTranslation $request)
+    public function __construct(private Collection $exportLanguages)
     {
-        $this->exportLanguages = new Collection($request->exportLanguages);
     }
 
     public function collection(): Collection

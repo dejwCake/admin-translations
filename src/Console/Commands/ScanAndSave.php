@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Console\Commands;
 
-use Brackets\AdminTranslations\Translation;
-use Brackets\AdminTranslations\TranslationsScanner;
-use Carbon\CarbonImmutable;
+use Brackets\AdminTranslations\Service\ScanAndSaveService;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\Console\Input\InputArgument;
 
-class ScanAndSave extends Command
+final class ScanAndSave extends Command
 {
     /**
      * The name and signature of the console command.
@@ -30,93 +28,32 @@ class ScanAndSave extends Command
      */
     protected $description = 'Scans all PHP files, extract translations and stores them into the database';
 
+    public function __construct(
+        private readonly ScanAndSaveService $scanAndSaveService,
+        private readonly Config $config,
+    ) {
+        parent::__construct();
+    }
+
     /**
      * Execute the console command.
      */
     public function handle(): void
     {
-        $scanner = app(TranslationsScanner::class);
-        (new Collection($this->argument('paths')))->each(static function ($path) use ($scanner): void {
-            $scanner->addScannedPath($path);
-        });
+        $count = $this->scanAndSaveService->scanAndSave(new Collection($this->argument('paths')));
 
-        [$trans, $underscore] = $scanner->getAllViewFilesWithTranslations();
-
-        DB::transaction(function () use ($trans, $underscore): void {
-            Translation::query()
-                ->whereNull('deleted_at')
-                ->update([
-                    'deleted_at' => CarbonImmutable::now(),
-                ]);
-
-            $trans->each(function ($trans): void {
-                [$group, $key] = explode('.', $trans, 2);
-                $namespaceAndGroup = explode('::', $group, 2);
-                if (count($namespaceAndGroup) === 1) {
-                    $namespace = '*';
-                    $group = $namespaceAndGroup[0];
-                } else {
-                    [$namespace, $group] = $namespaceAndGroup;
-                }
-                $this->createOrUpdate($namespace, $group, $key);
-            });
-
-            $underscore->each(function ($default): void {
-                $this->createOrUpdate('*', '*', $default);
-            });
-
-            $this->info(($trans->count() + $underscore->count()) . ' translations saved');
-        });
+        $this->info(sprintf('%s translations saved', $count));
     }
 
     protected function getArguments(): array
     {
         return [
-            ['paths', InputArgument::IS_ARRAY, 'Array of paths to scan.', (array) config(
-                'admin-translations.scanned_directories',
-            )],
+            [
+                'paths',
+                InputArgument::IS_ARRAY,
+                'Array of paths to scan.',
+                (array) $this->config->get('admin-translations.scanned_directories', []),
+            ],
         ];
-    }
-
-    protected function createOrUpdate(string $namespace, string $group, string $key): void
-    {
-        $translation = Translation::withTrashed()
-            ->where('namespace', $namespace)
-            ->where('group', $group)
-            ->where('key', $key)
-            ->first();
-
-        $defaultLocale = (string) config('app.locale');
-
-        if ($translation !== null) {
-            if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
-                $translation->restore();
-            }
-        } else {
-            $translation = new Translation();
-            $translation->namespace = $namespace;
-            $translation->group = $group;
-            $translation->key = $key;
-            $translation->text = [];
-
-            if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
-                $translation->save();
-            }
-        }
-    }
-
-    private function isCurrentTransForTranslationArray(Translation $translation, string $locale): bool
-    {
-        if ($translation->group === '*') {
-            return is_array(__($translation->key, [], $locale));
-        }
-
-        if ($translation->namespace === '*') {
-            return is_array(trans($translation->group . '.' . $translation->key, [], $locale));
-        }
-
-        return is_array(
-            trans($translation->namespace . '::' . $translation->group . '.' . $translation->key, [], $locale),
-        );
     }
 }

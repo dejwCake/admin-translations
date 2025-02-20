@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Tests\Feature;
 
+use Brackets\AdminTranslations\Models\Translation;
 use Brackets\AdminTranslations\Tests\TestCase;
-use Brackets\AdminTranslations\Translation;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;

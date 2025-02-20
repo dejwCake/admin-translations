@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie;
 
 use Brackets\AdminTranslations\Tests\TestCase;
-use Brackets\AdminTranslations\TranslationLoaders\Db;
+use Brackets\AdminTranslations\TranslationLoaders\DbTranslationLoader;
 
 class TranslationManagerLanguageLineTest extends TestCase
 {
@@ -19,7 +19,7 @@ class TranslationManagerLanguageLineTest extends TestCase
     public function testItWillMergeTranslationFromAllProviders(): void
     {
         $this->app['config']->set('admin-translations.translation_loaders', [
-            Db::class,
+            DbTranslationLoader::class,
             DummyLoader::class,
         ]);
 

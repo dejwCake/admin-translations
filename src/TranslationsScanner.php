@@ -21,7 +21,7 @@ class TranslationsScanner
      */
     private Collection $scannedPaths;
 
-    public function __construct(private Filesystem $disk)
+    public function __construct(private readonly Filesystem $disk)
     {
         $this->scannedPaths = new Collection([]);
     }

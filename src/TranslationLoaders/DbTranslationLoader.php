@@ -5,10 +5,15 @@ declare(strict_types=1);
 namespace Brackets\AdminTranslations\TranslationLoaders;
 
 use Brackets\AdminTranslations\Exceptions\InvalidConfiguration;
-use Brackets\AdminTranslations\Translation;
+use Brackets\AdminTranslations\Models\Translation;
+use Illuminate\Contracts\Config\Repository as Config;
 
-class Db implements TranslationLoader
+class DbTranslationLoader implements TranslationLoader
 {
+    public function __construct(private readonly Config $config)
+    {
+    }
+
     /**
      * Returns all translations for the given locale and group.
      *
@@ -27,7 +32,7 @@ class Db implements TranslationLoader
      */
     protected function getConfiguredModelClass(): string
     {
-        $modelClass = config('admin-translations.model');
+        $modelClass = $this->config->get('admin-translations.model');
 
         if (!is_a(new $modelClass(), Translation::class)) {
             throw InvalidConfiguration::invalidModel($modelClass);

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Brackets\AdminTranslations\Tests;
 
 use Brackets\AdminTranslations\AdminTranslationsServiceProvider;
+use Brackets\AdminTranslations\Models\Translation;
 use Brackets\AdminTranslations\Providers\TranslationServiceProvider;
-use Brackets\AdminTranslations\Translation;
 use Brackets\Translatable\Models\WithTranslations;
 use Brackets\Translatable\TranslatableServiceProvider;
 use Illuminate\Database\Schema\Blueprint;

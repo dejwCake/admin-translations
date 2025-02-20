@@ -17,6 +17,7 @@ parameters:
     paths:
         - ./config
         - ./database
+        - ./install-stubs
         - ./lang
         - ./resources
         - ./routes

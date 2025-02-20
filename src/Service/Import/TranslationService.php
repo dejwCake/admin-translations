@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Service\Import;
 
+use Brackets\AdminTranslations\Exceptions\WrongImportFile;
 use Brackets\AdminTranslations\Imports\TranslationsImport;
+use Brackets\AdminTranslations\Models\Translation;
 use Brackets\AdminTranslations\Repositories\TranslationRepository;
-use Brackets\AdminTranslations\Translation;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
+use Throwable;
 
-class TranslationService
+readonly class TranslationService
 {
-    public function __construct(private readonly TranslationRepository $translationRepository)
+    public function __construct(private TranslationRepository $translationRepository)
     {
     }
 
@@ -210,11 +212,14 @@ class TranslationService
         return true;
     }
 
-    /** @return Collection<array<string, string>> */
+    /**
+     * @throws WrongImportFile
+     * @return Collection<array<string, string>>
+     */
     public function getCollectionFromImportedFile(UploadedFile $file, string $chosenLanguage): Collection
     {
         if ($file->getClientOriginalExtension() !== 'xlsx') {
-            abort(409, 'Unsupported file type');
+            throw new WrongImportFile('Unsupported file type');
         }
 
         try {
@@ -222,12 +227,12 @@ class TranslationService
                 ->first()->map(static fn (Collection $row) => $row->toArray());
 
             if (!$this->validImportFile($collectionFromImportedFile, $chosenLanguage)) {
-                abort(409, 'Wrong syntax in your import');
+                throw new WrongImportFile('Wrong syntax in your import');
             }
 
             return $collectionFromImportedFile;
-        } catch (\Throwable) {
-            abort(409, 'Unsupported file type');
+        } catch (Throwable) {
+            throw new WrongImportFile('Unsupported file type');
         }
     }
 }

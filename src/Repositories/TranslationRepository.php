@@ -4,19 +4,30 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Repositories;
 
-use Brackets\AdminTranslations\Translation;
+use Brackets\AdminTranslations\Models\Translation;
+use Illuminate\Config\Repository as Config;
+use Illuminate\Support\Collection;
 
-class TranslationRepository
+readonly class TranslationRepository
 {
-    public function createOrUpdate(string $namespace, string $group, string $key, string $language, string $text): void
+    public function __construct(private Config $config)
     {
+    }
+
+    public function createOrUpdate(
+        string $namespace,
+        string $group,
+        string $key,
+        ?string $language,
+        ?string $text,
+    ): void {
         $translation = Translation::withTrashed()
             ->where('namespace', $namespace)
             ->where('group', $group)
             ->where('key', $key)
             ->first();
 
-        $defaultLocale = config('app.locale');
+        $defaultLocale = (string) $this->config->get('app.locale');
 
         if ($translation !== null) {
             if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
@@ -27,7 +38,9 @@ class TranslationRepository
             $translation->namespace = $namespace;
             $translation->group = $group;
             $translation->key = $key;
-            $translation->text = [$language => $text];
+            $translation->text = $language !== null && $text !== null
+                ? [$language => $text]
+                : [];
 
             if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
                 $translation->save();
@@ -35,7 +48,14 @@ class TranslationRepository
         }
     }
 
-    protected function isCurrentTransForTranslationArray(Translation $translation, string $locale): bool
+    public function getUsedGroups(): Collection
+    {
+        return Translation::whereNull('deleted_at')
+            ->groupBy('group')
+            ->pluck('group');
+    }
+
+    private function isCurrentTransForTranslationArray(Translation $translation, string $locale): bool
     {
         if ($translation->group === '*') {
             return is_array(__($translation->key, [], $locale));

@@ -9,6 +9,7 @@
 
     <file>config/</file>
     <file>database/</file>
+    <file>install-stubs/</file>
     <file>lang/</file>
     <file>resources/</file>
     <file>routes/</file>
@@ -35,7 +36,7 @@
     </rule>
 
     <rule ref="SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty">
-        <exclude-pattern>src/Translation.php</exclude-pattern>
+        <exclude-pattern>src/Models/Translation.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Files.LineLength.LineTooLong">

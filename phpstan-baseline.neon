@@ -7,10 +7,46 @@ parameters:
 			path: config/auth.providers.admin_users.php
 
 		-
-			message: '#^Parameter \#1 \$view of function view expects view\-string\|null, string given\.$#'
-			identifier: argument.type
+			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 1
-			path: src/Http/Responses/TranslationsAdminListingResponse.php
+			path: src/AdminTranslationsServiceProvider.php
+
+		-
+			message: '#^Instanceof between Illuminate\\Config\\Repository and Illuminate\\Contracts\\Config\\Repository will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/AdminTranslationsServiceProvider.php
+
+		-
+			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 2
+			path: src/Models/Translation.php
+
+		-
+			message: '#^Instanceof between Illuminate\\Cache\\Repository and Illuminate\\Contracts\\Cache\\Repository will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Models/Translation.php
+
+		-
+			message: '#^Instanceof between Illuminate\\Config\\Repository and Illuminate\\Contracts\\Config\\Repository will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/Models/Translation.php
+
+		-
+			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/TranslationLoaderManager.php
+
+		-
+			message: '#^Instanceof between Illuminate\\Config\\Repository and Illuminate\\Contracts\\Config\\Repository will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: src/TranslationLoaderManager.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'

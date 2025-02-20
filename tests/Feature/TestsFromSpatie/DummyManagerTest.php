@@ -29,6 +29,7 @@ class DummyManagerTest extends TestCase
     public function testItCanTranslateUsingDummyManagerUsingFile(): void
     {
         self::assertEquals('en value', trans('file.key'));
+        self::assertEquals('nl value', trans('file.key', locale: 'nl'));
     }
 
     public function testItCanTranslateUsingDummyManagerUsingDb(): void
