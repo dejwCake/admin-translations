@@ -9,7 +9,6 @@ use Brackets\AdminTranslations\Console\Commands\ScanAndSave;
 use Brackets\AdminUI\AdminUIServiceProvider;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class AdminTranslationsServiceProvider extends ServiceProvider
@@ -37,6 +36,20 @@ class AdminTranslationsServiceProvider extends ServiceProvider
                 ], 'migrations');
             }
         }
+
+        $config = app(Config::class);
+        assert($config instanceof Config);
+
+        if ($config->get('admin-translations.use_routes', true)) {
+            $router = app(Router::class);
+            if ($router->hasMiddlewareGroup('admin')) {
+                $router->middleware(['web', 'admin'])
+                    ->group(__DIR__ . '/../routes/admin.php');
+            } else {
+                $router->middleware(['web'])
+                    ->group(__DIR__ . '/../routes/admin.php');
+            }
+        }
     }
 
     public function register(): void
@@ -48,19 +61,6 @@ class AdminTranslationsServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/auth.guard.admin.php', 'auth.guards.admin');
 
         $this->mergeConfigFrom(__DIR__ . '/../config/auth.providers.admin_users.php', 'auth.providers.admin_users');
-
-        $config = app(Config::class);
-        assert($config instanceof Config);
-
-        if ($config->get('admin-translations.use_routes', true)) {
-            if (app(Router::class)->hasMiddlewareGroup('admin')) {
-                Route::middleware(['web', 'admin'])
-                    ->group(__DIR__ . '/../routes/admin.php');
-            } else {
-                Route::middleware(['web'])
-                    ->group(__DIR__ . '/../routes/admin.php');
-            }
-        }
 
         // provider auto-discovery has limits - in tests we have to explicitly register providers
         if ($this->app->runningUnitTests()) {
