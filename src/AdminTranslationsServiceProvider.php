@@ -15,27 +15,8 @@ class AdminTranslationsServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        $this->commands([
-            ScanAndSave::class,
-            AdminTranslationsInstall::class,
-        ]);
-
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'brackets/admin-translations');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'brackets/admin-translations');
-
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__ . '/../install-stubs/config/admin-translations.php' => config_path('admin-translations.php'),
-            ], 'config');
-
-            if (!glob(base_path('database/migrations/*_create_translations_table.php'))) {
-                $timestamp = date('Y_m_d_His');
-                $this->publishes([
-                    __DIR__ . '/../database/migrations/create_translations_table.php' =>
-                        database_path('migrations') . '/' . $timestamp . '_create_translations_table.php',
-                ], 'migrations');
-            }
-        }
 
         $config = app(Config::class);
         assert($config instanceof Config);
@@ -48,6 +29,20 @@ class AdminTranslationsServiceProvider extends ServiceProvider
             } else {
                 $router->middleware(['web'])
                     ->group(__DIR__ . '/../routes/admin.php');
+            }
+        }
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../install-stubs/config/admin-translations.php' => config_path('admin-translations.php'),
+            ], 'config');
+
+            if (!glob(base_path('database/migrations/*_create_translations_table.php'))) {
+                $timestamp = date('Y_m_d_His');
+                $this->publishes([
+                    __DIR__ . '/../database/migrations/create_translations_table.php' =>
+                        database_path('migrations') . '/' . $timestamp . '_create_translations_table.php',
+                ], 'migrations');
             }
         }
     }
@@ -66,5 +61,10 @@ class AdminTranslationsServiceProvider extends ServiceProvider
         if ($this->app->runningUnitTests()) {
             $this->app->register(AdminUIServiceProvider::class);
         }
+
+        $this->commands([
+            ScanAndSave::class,
+            AdminTranslationsInstall::class,
+        ]);
     }
 }
