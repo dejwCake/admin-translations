@@ -33,9 +33,9 @@
     ],
     "require": {
         "php": "^8.1",
-        "dejwcake/admin-listing": "dev-main",
-        "dejwcake/admin-ui": "dev-main",
-        "dejwcake/craftable-translatable": "dev-main",
+        "dejwcake/admin-listing": "^0.9",
+        "dejwcake/admin-ui": "^0.9",
+        "dejwcake/craftable-translatable": "^0.9",
         "illuminate/console": "^10.0",
         "illuminate/container": "^10.0",
         "illuminate/contracts": "^10.0",
