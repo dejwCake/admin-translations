@@ -106,6 +106,8 @@ class TranslationsScanner
             ')' .
             // Closing quote
             '[\"]' .
+            // Optional comma
+            '(?:,\s*)?' .
 
             // Close parentheses or new parameter
             '[\)]'
@@ -134,6 +136,8 @@ class TranslationsScanner
             ')' .
             // Closing quote
             '[\']' .
+            // Optional comma
+            '(?:,\s*)?' .
 
             // Close parentheses or new parameter
             '[\)]'
