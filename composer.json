@@ -54,8 +54,7 @@
     "autoload": {
         "psr-4": {
             "Brackets\\AdminTranslations\\": "src/"
-        },
-        "classmap": []
+        }
     },
     "autoload-dev": {
         "psr-4": {
