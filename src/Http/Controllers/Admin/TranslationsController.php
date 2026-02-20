@@ -17,6 +17,7 @@ use Brackets\AdminTranslations\Service\Import\TranslationService;
 use Brackets\Translatable\Translatable;
 use Carbon\CarbonImmutable;
 use Exception;
+use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,6 +35,7 @@ final class TranslationsController extends BaseController
     public function __construct(
         private readonly TranslationService $translationService,
         private readonly TranslationRepository $translationRepository,
+        private readonly Config $config,
         private readonly Redirector $redirector,
         private readonly ViewFactory $viewFactory,
     ) {
@@ -62,6 +64,10 @@ final class TranslationsController extends BaseController
         );
 
         $locales = $translatable->getLocales();
+        $userLocale = (isset($request->user()->language)
+            && in_array($request->user()->language, $this->config->get('translatable.locales'), true))
+            ? $request->user()->language
+            : 'en';
 
         $collection = $data instanceof LengthAwarePaginator ? $data->getCollection() : $data;
         $collection->map(function (Translation $translation) use ($locales) {
@@ -84,6 +90,7 @@ final class TranslationsController extends BaseController
             [
                 'data' => $data,
                 'locales' => $locales,
+                'userLocale' => $userLocale,
                 'groups' => $this->translationRepository->getUsedGroups(),
             ],
         );

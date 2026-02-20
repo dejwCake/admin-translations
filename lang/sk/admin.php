@@ -14,7 +14,6 @@ return [
     'fields' => [
         'group' => 'Skupina',
         'default' => 'Prednastavené',
-        'english' => 'English',
         'current_value' => 'Aktuálna hodnota',
         'imported_value' => 'Importovaná hodnota',
         'select_language' => 'Vybrať jazyk',
@@ -30,18 +29,15 @@ return [
         'conflict_notice_we_have_found' => 'Našli sme',
         'conflict_notice_translations_to_be_imported' => 'prekladov na importovanie. Prosím preskúmaj ich',
         'conflict_notice_differ' => 'preklady, ktoré sa líšia pred pokračovaním.',
-        'sucesfully_notice' => 'prekladov úspešne importovaných',
-        'sucesfully_notice_update' => 'prekladov úspešne aktualizovaných.',
+        'successfully_notice' => 'prekladov úspešne importovaných',
+        'successfully_notice_update' => 'prekladov úspešne aktualizovaných.',
         'choose_file' => 'Vybrať súbor',
         'upload_file' => 'Nahrať súbor',
     ],
 
     'export' => [
         'notice' => 'Môžeš exportovať preklady vybraného jazyka ako .xslx súbor.',
-        'language_to_export' => 'Jazyk na importovanie',
-        'export_reference_language' => 'Exportovať povôdný jazyk - užitočné ak chceš vidieť preklad v pôvodnom jazyku '
-            . 'v rozdielnom stĺpci, preklady si môžeš jednoducho porovnať.',
-        'reference_langauge' => 'Pôvodný jazyk',
+        'language_to_export' => 'Jazyk na exportovanie',
     ],
 
     'index' => [
