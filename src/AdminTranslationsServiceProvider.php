@@ -33,23 +33,13 @@ class AdminTranslationsServiceProvider extends ServiceProvider
         }
 
         if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__ . '/../install-stubs/config/admin-translations.php' => config_path('admin-translations.php'),
-            ], 'config');
-
-            if (!glob(base_path('database/migrations/*_create_translations_table.php'))) {
-                $timestamp = date('Y_m_d_His');
-                $this->publishes([
-                    __DIR__ . '/../database/migrations/create_translations_table.php' =>
-                        database_path('migrations') . '/' . $timestamp . '_create_translations_table.php',
-                ], 'migrations');
-            }
+            $this->publish();
         }
     }
 
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../install-stubs/config/admin-translations.php', 'admin-translations');
+        $this->mergeConfigFrom(__DIR__ . '/../config/admin-translations.php', 'admin-translations');
 
         $this->mergeConfigFrom(__DIR__ . '/../config/admin-auth.php', 'admin-auth.defaults');
 
@@ -65,6 +55,26 @@ class AdminTranslationsServiceProvider extends ServiceProvider
         $this->commands([
             ScanAndSave::class,
             AdminTranslationsInstall::class,
+        ]);
+    }
+
+    private function publish(): void
+    {
+        $this->publishes([
+            __DIR__ . '/../config/admin-translations.php' => $this->app->configPath('admin-translations.php'),
+        ], 'config');
+
+        if (!glob($this->app->basePath('database/migrations/*_create_translations_table.php'))) {
+            $timestamp = date('Y_m_d_His');
+            $this->publishes([
+                __DIR__ . '/../database/migrations/create_translations_table.php' => $this->app->databasePath(
+                    'migrations',
+                ) . '/' . $timestamp . '_create_translations_table.php',
+            ], 'migrations');
+        }
+
+        $this->publishes([
+            __DIR__ . '/../lang' => $this->app->langPath('vendor/courier'),
         ]);
     }
 }

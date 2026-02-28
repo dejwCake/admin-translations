@@ -64,8 +64,8 @@ final class TranslationsController extends BaseController
         );
 
         $locales = $translatable->getLocales();
-        $userLocale = (isset($request->user()->language)
-            && in_array($request->user()->language, $this->config->get('translatable.locales'), true))
+        $userLocale = isset($request->user()->language)
+            && in_array($request->user()->language, $this->config->get('translatable.locales'), true)
             ? $request->user()->language
             : 'en';
 

@@ -14,7 +14,6 @@
 
     <file>config/</file>
     <file>database/</file>
-    <file>install-stubs/</file>
     <file>lang/</file>
     <file>resources/</file>
     <file>routes/</file>
