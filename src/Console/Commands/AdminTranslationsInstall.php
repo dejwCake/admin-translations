@@ -54,7 +54,7 @@ final class AdminTranslationsInstall extends Command
             resource_path('views/admin/layout/sidebar.blade.php'),
             '{{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
             //phpcs:ignore SlevomatCodingStandard.Files.LineLength.LineTooLong
-            '<li class="nav-item"><a class="nav-link" href="{{ url(\'admin/translations\') }}"><i class="nav-icon icon-location-pin"></i> {{ __(\'Translations\') }}</a></li>
+            '<li class="nav-item"><a class="nav-link" href="{{ url(\'admin/translations\') }}"><i class="nav-icon fa fa-language"></i> {{ __(\'Translations\') }}</a></li>
             {{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
             '|url\(\'admin\/translations\'\)|',
         );
