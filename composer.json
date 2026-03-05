@@ -33,9 +33,9 @@
     ],
     "require": {
         "php": "^8.2",
-        "dejwcake/admin-listing": "^1.0",
-        "dejwcake/admin-ui": "^1.0",
-        "dejwcake/craftable-translatable": "^1.0",
+        "dejwcake/admin-listing": "^2.0",
+        "dejwcake/admin-ui": "^2.0",
+        "dejwcake/craftable-translatable": "^2.0",
         "illuminate/console": "^12.0",
         "illuminate/container": "^12.0",
         "illuminate/contracts": "^12.0",
@@ -66,9 +66,10 @@
             "providers": [
                 "Brackets\\AdminTranslations\\AdminTranslationsServiceProvider"
             ]
+        },
+        "branch-alias": {
+            "dev-main": "1.0-dev",
+            "dev-v2-dev": "2.0-dev"
         }
-    },
-    "branch-alias": {
-        "dev-main": "1.0-dev"
     }
 }
