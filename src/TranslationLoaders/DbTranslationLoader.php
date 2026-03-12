@@ -8,9 +8,9 @@ use Brackets\AdminTranslations\Exceptions\InvalidConfiguration;
 use Brackets\AdminTranslations\Models\Translation;
 use Illuminate\Contracts\Config\Repository as Config;
 
-class DbTranslationLoader implements TranslationLoader
+final readonly class DbTranslationLoader implements TranslationLoader
 {
-    public function __construct(private readonly Config $config)
+    public function __construct(private Config $config)
     {
     }
 

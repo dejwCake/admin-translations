@@ -8,7 +8,7 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Translation\TranslationServiceProvider as IlluminateTranslationServiceProvider;
 
-class TranslationServiceProvider extends IlluminateTranslationServiceProvider implements DeferrableProvider
+final class TranslationServiceProvider extends IlluminateTranslationServiceProvider implements DeferrableProvider
 {
     /**
      * Register the translation line loader. This method registers a

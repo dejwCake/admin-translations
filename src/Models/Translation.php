@@ -42,7 +42,7 @@ class Translation extends Model
      */
     public static function boot(): void
     {
-        static::bootTraits();
+        parent::boot();
 
         static::saved(static function (self $translation): void {
             $translation->flushGroupCache();
@@ -84,7 +84,7 @@ class Translation extends Model
 
     public static function getCacheKey(string $namespace, string $group, string $locale): string
     {
-        return "brackets.admin-translations.{$namespace}.{$group}.{$locale}";
+        return sprintf('brackets.admin-translations.%s.%s.%s', $namespace, $group, $locale);
     }
 
     public function getTranslation(string $locale, ?string $group = null): string

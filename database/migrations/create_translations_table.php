@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('translations', static function (Blueprint $table): void {
-            $table->increments('id');
+            $table->id();
             $table->string('namespace')->default('*');
             $table->index('namespace');
             $table->string('group');
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::drop('translations');
+        Schema::dropIfExists('translations');
     }
 };

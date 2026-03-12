@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie\TranslationManagers;
 
-use Brackets\AdminTranslations\TranslationLoaderManager;
+use Brackets\AdminTranslations\TranslationLoaders\TranslationLoaderManager;
 
 class DummyManager extends TranslationLoaderManager
 {

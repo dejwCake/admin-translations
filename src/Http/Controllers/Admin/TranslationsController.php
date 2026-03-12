@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Http\Controllers\Admin;
 
-use Brackets\AdminListing\Services\AdminListingService;
+use Brackets\AdminListing\Services\AdminListingBuilder;
 use Brackets\AdminTranslations\Exceptions\WrongImportFile;
 use Brackets\AdminTranslations\Exports\TranslationsExport;
 use Brackets\AdminTranslations\Http\Requests\Admin\Translation\ExportTranslation;
@@ -13,7 +13,7 @@ use Brackets\AdminTranslations\Http\Requests\Admin\Translation\IndexTranslation;
 use Brackets\AdminTranslations\Http\Requests\Admin\Translation\UpdateTranslation;
 use Brackets\AdminTranslations\Models\Translation;
 use Brackets\AdminTranslations\Repositories\TranslationRepository;
-use Brackets\AdminTranslations\Service\Import\TranslationService;
+use Brackets\AdminTranslations\Service\TranslationImportService;
 use Brackets\Translatable\Translatable;
 use Carbon\CarbonImmutable;
 use Exception;
@@ -33,8 +33,9 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 final class TranslationsController extends BaseController
 {
     public function __construct(
-        private readonly TranslationService $translationService,
+        private readonly TranslationImportService $translationService,
         private readonly TranslationRepository $translationRepository,
+        private readonly AdminListingBuilder $adminListingBuilder,
         private readonly Config $config,
         private readonly Redirector $redirector,
         private readonly ViewFactory $viewFactory,
@@ -48,8 +49,7 @@ final class TranslationsController extends BaseController
      */
     public function index(IndexTranslation $request, Translatable $translatable): array|View
     {
-        // create and AdminListing instance for a specific model and
-        $data = AdminListingService::create(Translation::class)->processRequestAndGet(
+        $data = $this->adminListingBuilder->for(Translation::class)->build()->processRequestAndGet(
         // pass the request with params
             $request,
             // set columns to query
@@ -113,7 +113,7 @@ final class TranslationsController extends BaseController
     public function export(Excel $excel, ExportTranslation $request): BinaryFileResponse
     {
         $currentTime = CarbonImmutable::now()->toDateTimeString();
-        $nameOfExportedFile = 'translations' . $currentTime . '.xlsx';
+        $nameOfExportedFile = sprintf('translations_%s.xlsx', $currentTime);
 
         return $excel->download(new TranslationsExport($request->getExportLanguages()), $nameOfExportedFile);
     }
@@ -195,9 +195,9 @@ final class TranslationsController extends BaseController
         }
 
         if ($translation->namespace === '*') {
-            return trans($translation->group . '.' . $translation->key, [], $locale);
+            return trans(sprintf('%s.%s', $translation->group, $translation->key), [], $locale);
         }
 
-        return trans($translation->namespace . '::' . $translation->group . '.' . $translation->key, [], $locale);
+        return trans(sprintf('%s::%s.%s', $translation->namespace, $translation->group, $translation->key), [], $locale);
     }
 }

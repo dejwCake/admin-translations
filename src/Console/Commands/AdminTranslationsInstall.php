@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminTranslations\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\Filesystem;
 
 final class AdminTranslationsInstall extends Command
@@ -25,8 +26,10 @@ final class AdminTranslationsInstall extends Command
      */
     protected $description = 'Install a brackets/admin-translations package';
 
-    public function __construct(public readonly Filesystem $filesystem)
-    {
+    public function __construct(
+        public readonly Filesystem $filesystem,
+        private readonly Application $app,
+    ) {
         parent::__construct();
     }
 
@@ -51,7 +54,7 @@ final class AdminTranslationsInstall extends Command
         ]);
 
         $this->strReplaceInFile(
-            resource_path('views/admin/layout/sidebar.blade.php'),
+            $this->app->resourcePath('views/admin/layout/sidebar.blade.php'),
             '{{-- Do not delete me :) I\'m also used for auto-generation menu items --}}',
             //phpcs:ignore SlevomatCodingStandard.Files.LineLength.LineTooLong
             '<li class="nav-item"><a class="nav-link" href="{{ url(\'admin/translations\') }}"><i class="nav-icon fa fa-language"></i> {{ __(\'Translations\') }}</a></li>
@@ -60,7 +63,7 @@ final class AdminTranslationsInstall extends Command
         );
 
         $this->strReplaceInFile(
-            config_path('app.php'),
+            $this->app->configPath('app.php'),
             '\'providers\' => ServiceProvider::defaultProviders()->merge([',
             '\'providers\' => ServiceProvider::defaultProviders()->replace([
         \Illuminate\Translation\TranslationServiceProvider::class => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,
@@ -69,7 +72,7 @@ final class AdminTranslationsInstall extends Command
         );
 
         $this->strReplaceInFile(
-            config_path('app.php'),
+            $this->app->configPath('app.php'),
             '];',
             '   \'providers\' => \Illuminate\Support\ServiceProvider::defaultProviders()->replace([
         \Illuminate\Translation\TranslationServiceProvider::class => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,

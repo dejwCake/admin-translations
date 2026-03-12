@@ -3,13 +3,13 @@
 declare(strict_types=1);
 
 use Brackets\AdminTranslations\Models\Translation;
-use Brackets\AdminTranslations\TranslationLoaderManager;
 use Brackets\AdminTranslations\TranslationLoaders\DbTranslationLoader;
+use Brackets\AdminTranslations\TranslationLoaders\TranslationLoaderManager;
 
 return [
 
     /*
-     * Language lines will be fetched by these loaders. You can put any class here that implements
+     * These loaders will fetch Language lines. You can put any class here that implements
      * the Brackets\AdminTranslations\TranslationLoaders\TranslationLoader-interface.
      */
     'translation_loaders' => [

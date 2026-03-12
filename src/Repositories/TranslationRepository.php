@@ -8,7 +8,7 @@ use Brackets\AdminTranslations\Models\Translation;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Support\Collection;
 
-readonly class TranslationRepository
+final readonly class TranslationRepository
 {
     public function __construct(private Config $config)
     {
@@ -26,6 +26,7 @@ readonly class TranslationRepository
             ->where('group', $group)
             ->where('key', $key)
             ->first();
+        assert($translation instanceof Translation|null);
 
         $defaultLocale = (string) $this->config->get('app.locale');
 
@@ -62,11 +63,11 @@ readonly class TranslationRepository
         }
 
         if ($translation->namespace === '*') {
-            return is_array(trans($translation->group . '.' . $translation->key, [], $locale));
+            return is_array(trans(sprintf('%s.%s', $translation->group, $translation->key), [], $locale));
         }
 
         return is_array(
-            trans($translation->namespace . '::' . $translation->group . '.' . $translation->key, [], $locale),
+            trans(sprintf('%s::%s.%s', $translation->namespace, $translation->group, $translation->key), [], $locale),
         );
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class IndexTranslation extends FormRequest
+final class IndexTranslation extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

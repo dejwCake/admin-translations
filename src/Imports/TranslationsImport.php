@@ -9,7 +9,7 @@ use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class TranslationsImport implements ToCollection, WithHeadingRow
+final readonly class TranslationsImport implements ToCollection, WithHeadingRow
 {
     use Importable;
 

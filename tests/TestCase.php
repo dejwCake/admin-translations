@@ -7,6 +7,7 @@ namespace Brackets\AdminTranslations\Tests;
 use Brackets\AdminTranslations\AdminTranslationsServiceProvider;
 use Brackets\AdminTranslations\Models\Translation;
 use Brackets\AdminTranslations\Providers\TranslationServiceProvider;
+use Brackets\AdminUI\AdminUIServiceProvider;
 use Brackets\Translatable\Models\WithTranslations;
 use Brackets\Translatable\TranslatableServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
@@ -69,6 +70,7 @@ abstract class TestCase extends Orchestra
     {
         return [
             TranslatableServiceProvider::class,
+            AdminUIServiceProvider::class,
             AdminTranslationsServiceProvider::class,
         ];
     }
@@ -98,7 +100,7 @@ abstract class TestCase extends Orchestra
                 'schema' => 'public',
                 'sslmode' => 'prefer',
             ]);
-        } else if (env('DB_CONNECTION') === 'mysql') {
+        } elseif (env('DB_CONNECTION') === 'mysql') {
             $app['config']->set('database.default', 'mysql');
             $app['config']->set('database.connections.mysql', [
                 'driver' => 'mysql',
@@ -130,7 +132,7 @@ abstract class TestCase extends Orchestra
 
     public function getFixturesDirectory(string $path): string
     {
-        return __DIR__ . "/fixtures/{$path}";
+        return sprintf('%s/fixtures/%s', __DIR__, $path);
     }
 
     //TODO reorder

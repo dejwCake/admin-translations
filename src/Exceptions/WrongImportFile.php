@@ -6,6 +6,6 @@ namespace Brackets\AdminTranslations\Exceptions;
 
 use RuntimeException;
 
-class WrongImportFile extends RuntimeException
+final class WrongImportFile extends RuntimeException
 {
 }

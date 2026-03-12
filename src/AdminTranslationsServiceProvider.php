@@ -6,23 +6,18 @@ namespace Brackets\AdminTranslations;
 
 use Brackets\AdminTranslations\Console\Commands\AdminTranslationsInstall;
 use Brackets\AdminTranslations\Console\Commands\ScanAndSave;
-use Brackets\AdminUI\AdminUIServiceProvider;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
-class AdminTranslationsServiceProvider extends ServiceProvider
+final class AdminTranslationsServiceProvider extends ServiceProvider
 {
-    public function boot(): void
+    public function boot(Config $config, Router $router): void
     {
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'brackets/admin-translations');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'brackets/admin-translations');
 
-        $config = app(Config::class);
-        assert($config instanceof Config);
-
         if ($config->get('admin-translations.use_routes', true)) {
-            $router = app(Router::class);
             if ($router->hasMiddlewareGroup('admin')) {
                 $router->middleware(['web', 'admin'])
                     ->group(__DIR__ . '/../routes/admin.php');
@@ -47,11 +42,6 @@ class AdminTranslationsServiceProvider extends ServiceProvider
 
         $this->mergeConfigFrom(__DIR__ . '/../config/auth.providers.admin_users.php', 'auth.providers.admin_users');
 
-        // provider auto-discovery has limits - in tests we have to explicitly register providers
-        if ($this->app->runningUnitTests()) {
-            $this->app->register(AdminUIServiceProvider::class);
-        }
-
         $this->commands([
             ScanAndSave::class,
             AdminTranslationsInstall::class,
@@ -67,14 +57,13 @@ class AdminTranslationsServiceProvider extends ServiceProvider
         if (!glob($this->app->basePath('database/migrations/*_create_translations_table.php'))) {
             $timestamp = date('Y_m_d_His');
             $this->publishes([
-                __DIR__ . '/../database/migrations/create_translations_table.php' => $this->app->databasePath(
-                    'migrations',
-                ) . '/' . $timestamp . '_create_translations_table.php',
+                __DIR__ . '/../database/migrations/create_translations_table.php'
+                => sprintf('%s/%s_create_translations_table.php', $this->app->databasePath('migrations'), $timestamp),
             ], 'migrations');
         }
 
         $this->publishes([
-            __DIR__ . '/../lang' => $this->app->langPath('vendor/courier'),
-        ]);
+            __DIR__ . '/../lang' => $this->app->langPath('vendor/courier')
+        ], 'lang');
     }
 }

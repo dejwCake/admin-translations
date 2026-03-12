@@ -11,7 +11,7 @@ use Illuminate\Contracts\Auth\Access\Gate;
 /**
  * @property Translation $translation
  */
-class UpdateTranslation extends TranslatableFormRequest
+final class UpdateTranslation extends TranslatableFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

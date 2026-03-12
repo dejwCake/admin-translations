@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Brackets\AdminTranslations\Http\Controllers\Admin;
 
 use Brackets\AdminTranslations\Http\Requests\Admin\Translation\RescanTranslations;
-use Brackets\AdminTranslations\Service\ScanAndSaveService;
+use Brackets\AdminTranslations\Scanner\ScanAndSaveService;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Controller as BaseController;

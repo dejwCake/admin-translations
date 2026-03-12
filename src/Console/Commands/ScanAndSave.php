@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Console\Commands;
 
-use Brackets\AdminTranslations\Service\ScanAndSaveService;
+use Brackets\AdminTranslations\Scanner\ScanAndSaveService;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Support\Collection;

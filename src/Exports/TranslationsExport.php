@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 
-class TranslationsExport implements FromCollection, WithMapping, WithHeadings
+final class TranslationsExport implements FromCollection, WithMapping, WithHeadings
 {
     public function __construct(private Collection $exportLanguages)
     {
@@ -46,6 +46,8 @@ class TranslationsExport implements FromCollection, WithMapping, WithHeadings
      */
     public function map($translation): array
     {
+        assert($translation instanceof Translation);
+
         $map = [
             $translation->namespace,
             $translation->group,
@@ -65,10 +67,10 @@ class TranslationsExport implements FromCollection, WithMapping, WithHeadings
         if ($translation->group === '*') {
             return __($translation->key, [], $language);
         } elseif ($translation->namespace === '*') {
-            return trans($translation->group . '.' . $translation->key, [], $language);
+            return trans(sprintf('%s.%s', $translation->group, $translation->key), [], $language);
         } else {
             return trans(
-                stripslashes($translation->namespace) . '::' . $translation->group . '.' . $translation->key,
+                sprintf('%s::%s.%s', stripslashes($translation->namespace), $translation->group, $translation->key),
                 [],
                 $language,
             );

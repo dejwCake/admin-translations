@@ -7,7 +7,7 @@ namespace Brackets\AdminTranslations\Http\Requests\Admin\Translation;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RescanTranslations extends FormRequest
+final class RescanTranslations extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

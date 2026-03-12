@@ -2,15 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminTranslations;
+namespace Brackets\AdminTranslations\TranslationLoaders;
 
-use Brackets\AdminTranslations\TranslationLoaders\TranslationLoader;
 use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Translation\FileLoader;
 
-class TranslationLoaderManager extends FileLoader
+final class TranslationLoaderManager extends FileLoader
 {
+    public function __construct(
+        Filesystem $files,
+        array|string $path,
+        private readonly Config $config,
+    ) {
+        parent::__construct($files, $path);
+    }
+
     /**
      * Load the messages for the given locale.
      *
@@ -33,10 +41,7 @@ class TranslationLoaderManager extends FileLoader
      */
     protected function getTranslationsForTranslationLoaders(string $locale, string $group, string $namespace): array
     {
-        $config = app(Config::class);
-        assert($config instanceof Config);
-
-        return (new Collection($config->get('admin-translations.translation_loaders')))
+        return (new Collection($this->config->get('admin-translations.translation_loaders')))
             ->map(static fn (string $className) => app($className))
             ->mapWithKeys(
                 static fn (TranslationLoader $translationLoader) => $translationLoader->loadTranslations(
