@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Override;
 
 final class TranslationsExport implements FromCollection, WithMapping, WithHeadings
 {
@@ -16,6 +17,7 @@ final class TranslationsExport implements FromCollection, WithMapping, WithHeadi
     {
     }
 
+    #[Override]
     public function collection(): Collection
     {
         return Translation::all();
@@ -24,6 +26,7 @@ final class TranslationsExport implements FromCollection, WithMapping, WithHeadi
     /**
      * @return array<string>
      */
+    #[Override]
     public function headings(): array
     {
         $headings = [
@@ -37,13 +40,13 @@ final class TranslationsExport implements FromCollection, WithMapping, WithHeadi
             static fn ($language): string => mb_strtoupper($language),
         )->toArray();
 
-        return array_merge($headings, $languageHeadings);
+        return [...$headings, ...$languageHeadings];
     }
 
     /**
      * @param Translation $translation
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
+    #[Override]
     public function map($translation): array
     {
         assert($translation instanceof Translation);
@@ -59,21 +62,23 @@ final class TranslationsExport implements FromCollection, WithMapping, WithHeadi
             fn (string $language) => $this->getCurrentTransForTranslationLanguage($translation, $language),
         );
 
-        return array_merge($map, $languages->toArray());
+        return [...$map, ...$languages->toArray()];
     }
 
     private function getCurrentTransForTranslationLanguage(Translation $translation, string $language): array|string
     {
-        if ($translation->group === '*') {
-            return __($translation->key, [], $language);
-        } elseif ($translation->namespace === '*') {
-            return trans(sprintf('%s.%s', $translation->group, $translation->key), [], $language);
-        } else {
-            return trans(
+        return match (true) {
+            $translation->group === '*' => __($translation->key, [], $language),
+            $translation->namespace === '*' => trans(
+                sprintf('%s.%s', $translation->group, $translation->key),
+                [],
+                $language,
+            ),
+            default => trans(
                 sprintf('%s::%s.%s', stripslashes($translation->namespace), $translation->group, $translation->key),
                 [],
                 $language,
-            );
-        }
+            ),
+        };
     }
 }

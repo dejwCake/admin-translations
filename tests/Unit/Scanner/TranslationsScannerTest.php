@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Tests\Unit\Scanner;
 
-use Brackets\AdminTranslations\Tests\TestCase;
 use Brackets\AdminTranslations\Scanner\TranslationsScanner;
+use Brackets\AdminTranslations\Tests\TestCase;
 use Illuminate\Support\Collection;
 
 class TranslationsScannerTest extends TestCase

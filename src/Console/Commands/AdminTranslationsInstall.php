@@ -26,10 +26,8 @@ final class AdminTranslationsInstall extends Command
      */
     protected $description = 'Install a brackets/admin-translations package';
 
-    public function __construct(
-        public readonly Filesystem $filesystem,
-        private readonly Application $app,
-    ) {
+    public function __construct(public readonly Filesystem $filesystem, private readonly Application $app,)
+    {
         parent::__construct();
     }
 

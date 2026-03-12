@@ -14,6 +14,12 @@ final class InvalidConfiguration extends Exception
      */
     public static function invalidModel(string $className): self
     {
-        return new self(sprintf('You have configured an invalid class `%s`.A valid class extends %s.', $className, Translation::class));
+        return new self(
+            sprintf(
+                'You have configured an invalid class `%s`.A valid class extends %s.',
+                $className,
+                Translation::class,
+            ),
+        );
     }
 }

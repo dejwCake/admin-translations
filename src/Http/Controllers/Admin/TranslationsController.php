@@ -190,14 +190,18 @@ final class TranslationsController extends BaseController
 
     private function getCurrentTransForTranslation(Translation $translation, string $locale): array|string
     {
-        if ($translation->group === '*') {
-            return __($translation->key, [], $locale);
-        }
-
-        if ($translation->namespace === '*') {
-            return trans(sprintf('%s.%s', $translation->group, $translation->key), [], $locale);
-        }
-
-        return trans(sprintf('%s::%s.%s', $translation->namespace, $translation->group, $translation->key), [], $locale);
+        return match (true) {
+            $translation->group === '*' => __($translation->key, [], $locale),
+            $translation->namespace === '*' => trans(
+                sprintf('%s.%s', $translation->group, $translation->key),
+                [],
+                $locale,
+            ),
+            default => trans(
+                sprintf('%s::%s.%s', $translation->namespace, $translation->group, $translation->key),
+                [],
+                $locale,
+            ),
+        };
     }
 }

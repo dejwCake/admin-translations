@@ -9,15 +9,18 @@ use Brackets\AdminTranslations\Console\Commands\ScanAndSave;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
+use Override;
 
 final class AdminTranslationsServiceProvider extends ServiceProvider
 {
-    public function boot(Config $config, Router $router): void
+    public function boot(): void
     {
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'brackets/admin-translations');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'brackets/admin-translations');
 
+        $config = $this->app->make(Config::class);
         if ($config->get('admin-translations.use_routes', true)) {
+            $router = $this->app->make(Router::class);
             if ($router->hasMiddlewareGroup('admin')) {
                 $router->middleware(['web', 'admin'])
                     ->group(__DIR__ . '/../routes/admin.php');
@@ -32,6 +35,7 @@ final class AdminTranslationsServiceProvider extends ServiceProvider
         }
     }
 
+    #[Override]
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/admin-translations.php', 'admin-translations');
@@ -63,7 +67,7 @@ final class AdminTranslationsServiceProvider extends ServiceProvider
         }
 
         $this->publishes([
-            __DIR__ . '/../lang' => $this->app->langPath('vendor/courier')
+            __DIR__ . '/../lang' => $this->app->langPath('vendor/courier'),
         ], 'lang');
     }
 }

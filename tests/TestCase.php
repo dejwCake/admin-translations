@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Translation\TranslationServiceProvider as IlluminateTranslationServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
+use Override;
 
 abstract class TestCase extends Orchestra
 {
@@ -25,6 +26,7 @@ abstract class TestCase extends Orchestra
 
     protected Translation $languageLine;
 
+    #[Override]
     public function setUp(): void
     {
         parent::setUp();
@@ -51,9 +53,9 @@ abstract class TestCase extends Orchestra
 
     /**
      * @param Application $app
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
+    #[Override]
     public function overrideApplicationProviders($app): array
     {
         return [
@@ -63,9 +65,9 @@ abstract class TestCase extends Orchestra
 
     /**
      * @param Application $app
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
+    #[Override]
     protected function getPackageProviders($app): array
     {
         return [
@@ -77,8 +79,8 @@ abstract class TestCase extends Orchestra
 
     /**
      * @param Application $app
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
+    #[Override]
     protected function getEnvironmentSetUp($app): void
     {
         $app['path.lang'] = $this->getFixturesDirectory('lang');
@@ -86,42 +88,11 @@ abstract class TestCase extends Orchestra
         $app['config']->set('admin-listing.with-translations-class', WithTranslations::class);
         $app['config']->set('translatable.locales', ['en', 'sk']);
 
-        if (env('DB_CONNECTION') === 'pgsql') {
-            $app['config']->set('database.default', 'pgsql');
-            $app['config']->set('database.connections.pgsql', [
-                'driver' => 'pgsql',
-                'host' => 'pgsql',
-                'port' => '5432',
-                'database' => env('DB_DATABASE', 'laravel'),
-                'username' => env('DB_USERNAME', 'root'),
-                'password' => env('DB_PASSWORD', 'bestsecret'),
-                'charset' => 'utf8',
-                'prefix' => '',
-                'schema' => 'public',
-                'sslmode' => 'prefer',
-            ]);
-        } elseif (env('DB_CONNECTION') === 'mysql') {
-            $app['config']->set('database.default', 'mysql');
-            $app['config']->set('database.connections.mysql', [
-                'driver' => 'mysql',
-                'host' => 'mysql',
-                'port' => '3306',
-                'database' => env('DB_DATABASE', 'laravel'),
-                'username' => env('DB_USERNAME', 'root'),
-                'password' => env('DB_PASSWORD', 'bestsecret'),
-                'charset' => 'utf8',
-                'prefix' => '',
-                'schema' => 'public',
-                'sslmode' => 'prefer',
-            ]);
-        } else {
-            $app['config']->set('database.default', 'sqlite');
-            $app['config']->set('database.connections.sqlite', [
-                'driver' => 'sqlite',
-                'database' => ':memory:',
-                'prefix' => '',
-            ]);
-        }
+        match (env('DB_CONNECTION')) {
+            'pgsql' => $this->configurePgsql($app),
+            'mysql' => $this->configureMysql($app),
+            default => $this->configureSqlite($app),
+        };
 
         $app['config']->set('admin-translations.model', Translation::class);
 
@@ -138,6 +109,50 @@ abstract class TestCase extends Orchestra
     //TODO reorder
     protected function createTranslation(string $namespace, string $group, string $key, array $text): Translation
     {
-        return Translation::create(compact('group', 'key', 'namespace', 'text'));
+        return Translation::create(['group' => $group, 'key' => $key, 'namespace' => $namespace, 'text' => $text]);
+    }
+
+    private function configurePgsql(mixed $app): void
+    {
+        $app['config']->set('database.default', 'pgsql');
+        $app['config']->set('database.connections.pgsql', [
+            'driver' => 'pgsql',
+            'host' => 'pgsql',
+            'port' => '5432',
+            'database' => env('DB_DATABASE', 'laravel'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', 'bestsecret'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+            'sslmode' => 'prefer',
+        ]);
+    }
+
+    private function configureMysql(mixed $app): void
+    {
+        $app['config']->set('database.default', 'mysql');
+        $app['config']->set('database.connections.mysql', [
+            'driver' => 'mysql',
+            'host' => 'mysql',
+            'port' => '3306',
+            'database' => env('DB_DATABASE', 'laravel'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', 'bestsecret'),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+            'sslmode' => 'prefer',
+        ]);
+    }
+
+    private function configureSqlite(mixed $app): void
+    {
+        $app['config']->set('database.default', 'sqlite');
+        $app['config']->set('database.connections.sqlite', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
     }
 }

@@ -10,6 +10,7 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
+use Override;
 
 /**
  * @property string $namespace
@@ -40,6 +41,7 @@ class Translation extends Model
     /**
      * Boot method to declare event handlers
      */
+    #[Override]
     public static function boot(): void
     {
         parent::boot();
@@ -103,7 +105,7 @@ class Translation extends Model
 
     public function setTranslation(string $locale, string $value): self
     {
-        $this->text = array_merge($this->text ?? [], [$locale => $value]);
+        $this->text = [...($this->text ?? []), $locale => $value];
 
         return $this;
     }

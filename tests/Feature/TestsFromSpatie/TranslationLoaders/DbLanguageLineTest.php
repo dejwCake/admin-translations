@@ -93,6 +93,7 @@ class DbLanguageLineTest extends TestCase
             /**
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
+            #[\Override]
             public static function getTranslationsForGroupAndNamespace(
                 string $locale,
                 string $group,

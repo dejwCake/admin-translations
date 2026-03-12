@@ -7,6 +7,7 @@ namespace Brackets\AdminTranslations\Http\Requests\Admin\Translation;
 use Brackets\AdminTranslations\Models\Translation;
 use Brackets\Translatable\Http\Requests\TranslatableFormRequest;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Override;
 
 /**
  * @property Translation $translation
@@ -24,6 +25,7 @@ final class UpdateTranslation extends TranslatableFormRequest
     /**
      * Get the validation rules that apply to the request.
      */
+    #[Override]
     public function untranslatableRules(): array
     {
         return [
@@ -37,6 +39,7 @@ final class UpdateTranslation extends TranslatableFormRequest
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
+    #[Override]
     public function translatableRules(string $locale): array
     {
         return [

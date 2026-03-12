@@ -8,6 +8,7 @@ use Brackets\AdminTranslations\Scanner\ScanAndSaveService;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Support\Collection;
+use Override;
 use Symfony\Component\Console\Input\InputArgument;
 
 final class ScanAndSave extends Command
@@ -45,6 +46,7 @@ final class ScanAndSave extends Command
         $this->info(sprintf('%s translations saved', $count));
     }
 
+    #[Override]
     protected function getArguments(): array
     {
         return [

@@ -7,6 +7,7 @@ namespace Brackets\AdminTranslations\TranslationLoaders;
 use Brackets\AdminTranslations\Exceptions\InvalidConfiguration;
 use Brackets\AdminTranslations\Models\Translation;
 use Illuminate\Contracts\Config\Repository as Config;
+use Override;
 
 final readonly class DbTranslationLoader implements TranslationLoader
 {
@@ -20,6 +21,7 @@ final readonly class DbTranslationLoader implements TranslationLoader
      * @throws InvalidConfiguration
      * @return array<string, string>
      */
+    #[Override]
     public function loadTranslations(string $locale, string $group, string $namespace): array
     {
         $model = $this->getConfiguredModelClass();
@@ -30,7 +32,7 @@ final readonly class DbTranslationLoader implements TranslationLoader
     /**
      * @throws InvalidConfiguration
      */
-    protected function getConfiguredModelClass(): string
+    private function getConfiguredModelClass(): string
     {
         $modelClass = $this->config->get('admin-translations.model');
 

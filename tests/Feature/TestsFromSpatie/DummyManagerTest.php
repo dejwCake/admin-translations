@@ -7,13 +7,14 @@ namespace Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie;
 use Brackets\AdminTranslations\Tests\Feature\TestsFromSpatie\TranslationManagers\DummyManager;
 use Brackets\AdminTranslations\Tests\TestCase;
 use Illuminate\Foundation\Application;
+use Override;
 
 class DummyManagerTest extends TestCase
 {
     /**
      * @param Application $app
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
+    #[Override]
     protected function getEnvironmentSetUp($app): void
     {
         parent::getEnvironmentSetUp($app);

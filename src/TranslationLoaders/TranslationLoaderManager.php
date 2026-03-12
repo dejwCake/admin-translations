@@ -8,14 +8,12 @@ use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Translation\FileLoader;
+use Override;
 
 final class TranslationLoaderManager extends FileLoader
 {
-    public function __construct(
-        Filesystem $files,
-        array|string $path,
-        private readonly Config $config,
-    ) {
+    public function __construct(Filesystem $files, array|string $path, private readonly Config $config,)
+    {
         parent::__construct($files, $path);
     }
 
@@ -25,8 +23,8 @@ final class TranslationLoaderManager extends FileLoader
      * @param string $locale
      * @param string $group
      * @param string|null $namespace
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      */
+    #[Override]
     public function load($locale, $group, $namespace = null): array
     {
         $fileTranslations = parent::load($locale, $group, $namespace);
@@ -39,7 +37,7 @@ final class TranslationLoaderManager extends FileLoader
     /**
      * @return array<array<string, string>>
      */
-    protected function getTranslationsForTranslationLoaders(string $locale, string $group, string $namespace): array
+    private function getTranslationsForTranslationLoaders(string $locale, string $group, string $namespace): array
     {
         return (new Collection($this->config->get('admin-translations.translation_loaders')))
             ->map(static fn (string $className) => app($className))

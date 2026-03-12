@@ -10,13 +10,13 @@ parameters:
 			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
-			path: src/AdminTranslationsServiceProvider.php
+			path: src/Exports/TranslationsExport.php
 
 		-
-			message: '#^Instanceof between Illuminate\\Config\\Repository and Illuminate\\Contracts\\Config\\Repository will always evaluate to true\.$#'
+			message: '#^Instanceof between Brackets\\AdminTranslations\\Models\\Translation and Brackets\\AdminTranslations\\Models\\Translation will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
-			path: src/AdminTranslationsServiceProvider.php
+			path: src/Exports/TranslationsExport.php
 
 		-
 			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
@@ -40,13 +40,13 @@ parameters:
 			message: '#^Call to function assert\(\) with true will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
-			path: src/TranslationLoaderManager.php
+			path: src/Repositories/TranslationRepository.php
 
 		-
-			message: '#^Instanceof between Illuminate\\Config\\Repository and Illuminate\\Contracts\\Config\\Repository will always evaluate to true\.$#'
+			message: '#^Instanceof between Brackets\\AdminTranslations\\Models\\Translation and Brackets\\AdminTranslations\\Models\\Translation will always evaluate to true\.$#'
 			identifier: instanceof.alwaysTrue
 			count: 1
-			path: src/TranslationLoaderManager.php
+			path: src/Repositories/TranslationRepository.php
 
 		-
 			message: '#^Unreachable statement \- code above always terminates\.$#'
@@ -57,5 +57,5 @@ parameters:
 		-
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
-			count: 8
+			count: 7
 			path: tests/TestCase.php

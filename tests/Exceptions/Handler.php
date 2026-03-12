@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Session\TokenMismatchException;
 use Illuminate\Validation\ValidationException;
+use Override;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
@@ -40,6 +41,7 @@ class Handler extends ExceptionHandler
      *
      * @throws Throwable
      */
+    #[Override]
     public function report(Throwable $e): void
     {
         parent::report($e);
@@ -50,10 +52,10 @@ class Handler extends ExceptionHandler
      *
      * @param Request $request
      * @return Response
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      * @throws Throwable
      */
+    #[Override]
     public function render($request, Throwable $e)
     {
         return parent::render($request, $e);
@@ -67,9 +69,9 @@ class Handler extends ExceptionHandler
      * @return Response
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingNativeTypeHint
      * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.UselessAnnotation
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
+    #[Override]
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         if ($request->expectsJson()) {

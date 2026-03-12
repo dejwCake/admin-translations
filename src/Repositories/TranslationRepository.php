@@ -26,11 +26,11 @@ final readonly class TranslationRepository
             ->where('group', $group)
             ->where('key', $key)
             ->first();
-        assert($translation instanceof Translation|null);
 
         $defaultLocale = (string) $this->config->get('app.locale');
 
         if ($translation !== null) {
+            assert($translation instanceof Translation);
             if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
                 $translation->restore();
             }
@@ -58,16 +58,18 @@ final readonly class TranslationRepository
 
     private function isCurrentTransForTranslationArray(Translation $translation, string $locale): bool
     {
-        if ($translation->group === '*') {
-            return is_array(__($translation->key, [], $locale));
-        }
-
-        if ($translation->namespace === '*') {
-            return is_array(trans(sprintf('%s.%s', $translation->group, $translation->key), [], $locale));
-        }
-
-        return is_array(
-            trans(sprintf('%s::%s.%s', $translation->namespace, $translation->group, $translation->key), [], $locale),
-        );
+        return match (true) {
+            $translation->group === '*' => is_array(__($translation->key, [], $locale)),
+            $translation->namespace === '*' => is_array(
+                trans(sprintf('%s.%s', $translation->group, $translation->key), [], $locale),
+            ),
+            default => is_array(
+                trans(
+                    sprintf('%s::%s.%s', $translation->namespace, $translation->group, $translation->key),
+                    [],
+                    $locale,
+                ),
+            ),
+        };
     }
 }

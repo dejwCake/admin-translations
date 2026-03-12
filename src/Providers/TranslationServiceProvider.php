@@ -7,6 +7,7 @@ namespace Brackets\AdminTranslations\Providers;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Translation\TranslationServiceProvider as IlluminateTranslationServiceProvider;
+use Override;
 
 final class TranslationServiceProvider extends IlluminateTranslationServiceProvider implements DeferrableProvider
 {
@@ -15,13 +16,14 @@ final class TranslationServiceProvider extends IlluminateTranslationServiceProvi
      * `TranslationLoaderManager` instead of a simple `FileLoader` as the
      * applications `translation.loader` instance.
      */
+    #[Override]
     protected function registerLoader(): void
     {
         $this->app->singleton('translation.loader', static function ($app) {
             $config = $app->get(Config::class);
             $class = $config->get('admin-translations.translation_manager');
 
-            return new $class($app['files'], $app['path.lang']);
+            return new $class($app['files'], $app['path.lang'], $config);
         });
     }
 }
