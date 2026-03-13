@@ -91,7 +91,7 @@ jobs:
           MYSQL_PASSWORD: bestsecret
           MYSQL_ROOT_PASSWORD: bestsecret
         options: >-
-          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-cmd="mariadb-admin ping -h 127.0.0.1 -u root -pbestsecret"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
