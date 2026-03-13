@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Translation\TranslationServiceProvider as IlluminateTranslationServiceProvider;
+use Maatwebsite\Excel\ExcelServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Override;
 
@@ -74,6 +75,7 @@ abstract class TestCase extends Orchestra
             TranslatableServiceProvider::class,
             AdminUIServiceProvider::class,
             AdminTranslationsServiceProvider::class,
+            ExcelServiceProvider::class,
         ];
     }
 

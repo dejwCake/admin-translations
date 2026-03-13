@@ -12,9 +12,25 @@ class TranslationsScannerTest extends TestCase
 {
     private string $viewsDir = __DIR__ . '/../../fixtures/views';
 
+    public function testAddScannedPathMakesDirectoryAvailableForScanning(): void
+    {
+        $scanner = $this->app->make(TranslationsScanner::class);
+
+        // Without adding any path, scanner returns empty collections
+        [$trans, $underscore] = $scanner->getAllViewFilesWithTranslations();
+        self::assertCount(0, $trans);
+        self::assertCount(0, $underscore);
+
+        // After adding path, scanner finds translations
+        $scanner->addScannedPath($this->viewsDir);
+        [$trans, $underscore] = $scanner->getAllViewFilesWithTranslations();
+        self::assertGreaterThan(0, $trans->count());
+        self::assertGreaterThan(0, $underscore->count());
+    }
+
     public function testCollectingTranslations(): void
     {
-        $scanner = app(TranslationsScanner::class);
+        $scanner = $this->app->make(TranslationsScanner::class);
         $scanner->addScannedPath($this->viewsDir);
 
         self::assertEquals([

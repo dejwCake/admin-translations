@@ -23,7 +23,7 @@ final readonly class TranslationImportService
      */
     public function saveCollection(Collection $filteredCollection, string $language): void
     {
-        $filteredCollection->each(function ($item) use ($language): void {
+        $filteredCollection->each(function (array $item) use ($language): void {
             $this->translationRepository->createOrUpdate(
                 $item['namespace'],
                 $item['group'],
@@ -44,7 +44,7 @@ final readonly class TranslationImportService
 
     /**
      * @param array<string, string> $row
-     * @param array<string, string|Translation> $array
+     * @param array<string, array{id: int, text: array<string, string>}> $array
      */
     public function rowExistsInArray(array $row, array $array): bool
     {
@@ -53,7 +53,7 @@ final readonly class TranslationImportService
 
     /**
      * @param array<string, string|int> $row
-     * @param array<string, Translation> $array
+     * @param array<string, array{id: int, text?: array<string, string>}> $array
      */
     public function rowValueEqualsValueInArray(array $row, array $array, string $chosenLanguage): bool
     {
@@ -74,14 +74,12 @@ final readonly class TranslationImportService
         return true;
     }
 
-    /** @return array<string, Translation> */
+    /** @return array<string, array<int|string|array<string, string>>> */
     public function getAllTranslationsForGivenLang(string $chosenLanguage): array
     {
         return Translation::all()->filter(static function (Translation $translation) use ($chosenLanguage) {
-            //TODO this does not look ok
-            if (isset($translation->text->{$chosenLanguage})) {
-                return array_key_exists($chosenLanguage, $translation->text)
-                    && (string) $translation->text->{$chosenLanguage} !== '';
+            if (array_key_exists($chosenLanguage, $translation->text)) {
+                return (string) $translation->text[$chosenLanguage] !== '';
             }
 
             return true;
@@ -92,9 +90,9 @@ final readonly class TranslationImportService
     }
 
     /**
-     * @param array<string, Translation> $existingTranslations
+     * @param array<string, array{id: int, text: array<string, string>}> $existingTranslations
      * @param Collection<array<string, string|bool>> $collectionToUpdate
-     * @return array<string, int>
+     * @return array{numberOfImportedTranslations: int, numberOfUpdatedTranslations: int}
      */
     public function checkAndUpdateTranslations(
         string $chosenLanguage,
@@ -104,7 +102,7 @@ final readonly class TranslationImportService
         $numberOfImportedTranslations = 0;
         $numberOfUpdatedTranslations = 0;
 
-        $collectionToUpdate->map(function ($item) use (
+        $collectionToUpdate->map(function (array $item) use (
             $chosenLanguage,
             $existingTranslations,
             //phpcs:ignore SlevomatCodingStandard.PHP.DisallowReference.DisallowedInheritingVariableByReference
@@ -147,7 +145,7 @@ final readonly class TranslationImportService
 
     /**
      * @param Collection<array<string, string>> $collectionFromImportedFile
-     * @param array<string, Translation> $existingTranslations
+     * @param array<string, array{id: int, text: array<string, string>}> $existingTranslations
      * @return Collection<array<string, string|bool>>
      */
     public function getCollectionWithConflicts(
@@ -188,14 +186,16 @@ final readonly class TranslationImportService
 
     /**
      * @param Collection<array<string, string>> $collectionFromImportedFile
-     * @param array<string, Translation> $existingTranslations
+     * @param array<string, array{id: int, text: array<string, string>}> $existingTranslations
      * @return Collection<array<string, string>>
      */
     public function getFilteredExistingTranslations(
         Collection $collectionFromImportedFile,
         array $existingTranslations,
     ): Collection {
-        return $collectionFromImportedFile->reject(fn ($row) => $this->rowExistsInArray($row, $existingTranslations));
+        return $collectionFromImportedFile->reject(
+            fn (array $row) => $this->rowExistsInArray($row, $existingTranslations),
+        );
     }
 
     /** @param Collection<array<string, string>> $collectionToImport */

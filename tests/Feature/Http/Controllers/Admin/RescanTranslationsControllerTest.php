@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminTranslations\Tests\Feature;
+namespace Brackets\AdminTranslations\Tests\Feature\Http\Controllers\Admin;
 
 use Brackets\AdminTranslations\Tests\TestCase;
 use Illuminate\Foundation\Auth\User;
@@ -26,6 +26,37 @@ class RescanTranslationsControllerTest extends TestCase
             ->assertStatus(200)
             ->assertSee('good.key1')
         ;
+    }
+
+    public function testRescanRequiresAuthorization(): void
+    {
+        $this->actingAs(new User(), 'admin');
+        Gate::define('admin', static fn () => true);
+
+        $this->post('/admin/translations/rescan')
+            ->assertStatus(403);
+    }
+
+    public function testRescanViaAjaxReturnsEmptyArray(): void
+    {
+        $this->authorizedToRescan();
+
+        $response = $this->post(
+            '/admin/translations/rescan',
+            [],
+            ['X-Requested-With' => 'XMLHttpRequest'],
+        );
+
+        $response->assertOk();
+        $response->assertExactJson([]);
+    }
+
+    public function testRescanViaNonAjaxReturnsRedirect(): void
+    {
+        $this->authorizedToRescan();
+
+        $this->post('/admin/translations/rescan')
+            ->assertRedirect();
     }
 
     protected function authorizedToRescan(): void

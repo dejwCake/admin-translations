@@ -2,4 +2,7 @@
 <phpmd-baseline>
   <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="src/Http/Controllers/Admin/TranslationsController.php"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="src/Scanner/TranslationsScanner.php" method="getAllViewFilesWithTranslations"/>
+  <violation rule="PHPMD\Rule\Design\NumberOfChildren" file="tests/TestCase.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/TestCase.php"/>
+  <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Scanner/ScanAndSaveServiceTest.php"/>
 </phpmd-baseline>

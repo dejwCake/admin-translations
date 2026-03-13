@@ -13,11 +13,15 @@ use Illuminate\Support\Arr;
 use Override;
 
 /**
+ * @property int $id
  * @property string $namespace
  * @property string $group
  * @property string $key
  * @property array $text
+ * @property string $metadata
  * @property CarbonInterface $created_at
+ * @property CarbonInterface $updated_at
+ * @property CarbonInterface $deleted_at
  */
 class Translation extends Model
 {
@@ -91,10 +95,9 @@ class Translation extends Model
 
     public function getTranslation(string $locale, ?string $group = null): string
     {
-        $config = app(Config::class);
-        assert($config instanceof Config);
-
         if ($group === '*' && !isset($this->text[$locale])) {
+            $config = app(Config::class);
+            assert($config instanceof Config);
             $fallback = $config->get('app.fallback_locale');
 
             return $this->text[$fallback] ?? $this->key;
