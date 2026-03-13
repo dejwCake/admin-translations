@@ -11,7 +11,7 @@ Thumbs.db
 # Dependencies
 /vendor/
 
-# Composer (ignored here because this is a library)
+# Composer (library — consumers use their own lock file)
 composer.lock
 
 # PHP tools / caches
