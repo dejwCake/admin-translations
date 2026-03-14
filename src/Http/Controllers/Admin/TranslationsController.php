@@ -17,7 +17,6 @@ use Brackets\AdminTranslations\Repositories\TranslationRepository;
 use Brackets\AdminTranslations\Service\TranslationImportService;
 use Brackets\Translatable\Translatable;
 use Carbon\CarbonImmutable;
-use Exception;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Contracts\View\View;
@@ -46,8 +45,6 @@ final class TranslationsController extends BaseController
 
     /**
      * Display a listing of the resource.
-     *
-     * @throws Exception
      */
     public function index(IndexTranslation $request, Translatable $translatable): array|View
     {
