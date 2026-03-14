@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Http\Controllers\Admin;
 
-use Brackets\AdminListing\Services\AdminListingBuilder;
+use Brackets\AdminListing\Builders\ListingBuilder;
+use Brackets\AdminListing\Builders\ListingQueryBuilder;
 use Brackets\AdminTranslations\Exceptions\WrongImportFile;
 use Brackets\AdminTranslations\Exports\TranslationsExport;
 use Brackets\AdminTranslations\Http\Requests\Admin\Translation\ExportTranslation;
@@ -35,7 +36,8 @@ final class TranslationsController extends BaseController
     public function __construct(
         private readonly TranslationImportService $translationService,
         private readonly TranslationRepository $translationRepository,
-        private readonly AdminListingBuilder $adminListingBuilder,
+        private readonly ListingBuilder $listingBuilder,
+        private readonly ListingQueryBuilder $listingQueryBuilder,
         private readonly Config $config,
         private readonly Redirector $redirector,
         private readonly ViewFactory $viewFactory,
@@ -49,13 +51,12 @@ final class TranslationsController extends BaseController
      */
     public function index(IndexTranslation $request, Translatable $translatable): array|View
     {
-        $data = $this->adminListingBuilder->for(Translation::class)->build()->processRequestAndGet(
-        // pass the request with params
-            $request,
-            // set columns to query
-            ['id', 'namespace', 'group', 'key', 'text', 'created_at', 'updated_at'],
-            // set columns to searchIn
-            ['group', 'key', 'text->en', 'text->sk'],
+        $data = $this->listingBuilder->for(Translation::class)->build()->processRequestAndGet(
+            $this->listingQueryBuilder->fromRequest(
+                $request,
+                ['id', 'namespace', 'group', 'key', 'text', 'created_at', 'updated_at'],
+                ['group', 'key', 'text->en', 'text->sk'],
+            ),
             static function (Builder $query) use ($request): void {
                 if ($request->has('group')) {
                     $query->whereGroup($request->group);

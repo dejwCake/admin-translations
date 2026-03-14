@@ -2,7 +2,7 @@ services:
   test:
     image: dejwcake/php8.5:1
     environment:
-      DB_CONNECTION: pgsql
+      DB_CONNECTION: mysql
     volumes:
       - .:/var/www/html:delegated
     depends_on:
