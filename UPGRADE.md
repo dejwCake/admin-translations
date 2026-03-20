@@ -5,7 +5,7 @@
 | Dependency | v1 | v2 |
 |---|---|---|
 | PHP | ^8.2 | ^8.5 |
-| Laravel | ^12.0 | ^12.0 |
+| Laravel | ^12.0 | ^13.0 |
 | dejwcake/admin-listing | ^1.0 | ^2.0 |
 | dejwcake/admin-ui | ^1.0 | ^2.0 |
 | dejwcake/craftable-translatable | ^1.0 | ^2.0 |
