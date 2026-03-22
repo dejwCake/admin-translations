@@ -9,6 +9,7 @@ use Brackets\AdminTranslations\Models\Translation;
 use Brackets\AdminTranslations\Tests\TestCase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Translation\Translator;
+use Override;
 
 class DbLanguageLineTest extends TestCase
 {
@@ -93,7 +94,7 @@ class DbLanguageLineTest extends TestCase
             /**
              * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
              */
-            #[\Override]
+            #[Override]
             public static function getTranslationsForGroupAndNamespace(
                 string $locale,
                 string $group,
