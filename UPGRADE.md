@@ -83,7 +83,7 @@ use Brackets\AdminTranslations\TranslationLoaders\TranslationLoaderManager;
 
 ### 6. `AdminListingService::create()` Replaced with `AdminListingBuilder`
 
-The controller now uses `AdminListingBuilder` (injected via constructor) instead of the static `AdminListingService::create()` factory:
+The controller now uses `ListingBuilder` and `ListingQueryBuilder` (injected via constructor) instead of the static `AdminListingService::create()` factory:
 
 ```php
 // v1
@@ -91,13 +91,13 @@ $data = AdminListingService::create(Translation::class)
     ->processRequestAndGet(...);
 
 // v2
-$data = $this->adminListingBuilder
-    ->for(Translation::class)
-    ->build()
-    ->processRequestAndGet(...);
+$data = $this->listingBuilder->for(Translation::class)->build()->processRequestAndGet(
+    $this->listingQueryBuilder->fromRequest($request),
+    ...
+);
 ```
 
-**Action required:** If you extend `TranslationsController`, update to use `AdminListingBuilder`.
+**Action required:** If you extend `TranslationsController`, update to use `ListingBuilder` and `ListingQueryBuilder`.
 
 ### 7. Facades Replaced with Dependency Injection
 
@@ -148,13 +148,13 @@ The `resources/views/admin/translation/index.blade.php` has been completely rewr
 @endsection
 
 {{-- v2: Single component tag with props --}}
-@section('content')
+@section('body')
     <translation-listing
         :data="{{ $data->toJson() }}"
         :url="'{{ url('admin/translations') }}'"
-        :locales="{{ $locales->toJson() }}"
+        :locales="{{ json_encode($locales) }}"
         :user-locale="'{{ $userLocale }}'"
-        :groups="{{ $groups->toJson() }}"
+        :groups="{{ json_encode($groups) }}"
         :translations="{{ json_encode([...]) }}"
     ></translation-listing>
 @endsection
