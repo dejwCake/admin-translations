@@ -48,17 +48,19 @@ final class TranslationsController extends BaseController
      */
     public function index(IndexTranslation $request, Translatable $translatable): array|View
     {
-        $data = $this->listingBuilder->for(Translation::class)->build()->processRequestAndGet(
-            $this->listingQueryBuilder->fromRequest(
-                $request,
-                ['id', 'namespace', 'group', 'key', 'text', 'created_at', 'updated_at'],
-                ['group', 'key', 'text->en', 'text->sk'],
-            ),
-            static function (Builder $query) use ($request): void {
-                if ($request->has('group')) {
-                    $query->whereGroup($request->group);
-                }
-            },
+        $data = $this->listingBuilder->for(Translation::class)
+            ->build()
+            ->processRequestAndGet(
+                $this->listingQueryBuilder->fromRequest(
+                    $request,
+                    ['id', 'namespace', 'group', 'key', 'text', 'created_at', 'updated_at'],
+                    ['group', 'key', 'text->en', 'text->sk'],
+                ),
+                static function (Builder $query) use ($request): void {
+                    if ($request->has('group')) {
+                        $query->whereGroup($request->group);
+                    }
+                },
         );
 
         $locales = $translatable->getLocales();
@@ -108,7 +110,7 @@ final class TranslationsController extends BaseController
         return $this->redirector->to('admin/translation');
     }
 
-    public function export(Excel $excel, ExportTranslation $request): BinaryFileResponse
+    public function export(ExportTranslation $request, Excel $excel): BinaryFileResponse
     {
         $currentTime = CarbonImmutable::now()->toDateTimeString();
         $nameOfExportedFile = sprintf('translations_%s.xlsx', $currentTime);

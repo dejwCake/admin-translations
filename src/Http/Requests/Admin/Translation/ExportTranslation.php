@@ -15,7 +15,7 @@ final class ExportTranslation extends FormRequest
      */
     public function authorize(Gate $gate): bool
     {
-        return $gate->allows('admin.translation.edit');
+        return $gate->allows('admin.translation.index');
     }
 
     /**
