@@ -11,7 +11,7 @@
         :user-locale="'{{ $userLocale }}'"
         :groups="{{ json_encode($groups) }}"
         :translations="{{ json_encode([
-            'title' => trans('brackets/admin-translations::admin.index.title'),
+            'listing_title' => trans('brackets/admin-translations::admin.index.title'),
             'rescan_btn' => trans('brackets/admin-translations::admin.btn.re_scan'),
             'import_btn' => trans('brackets/admin-translations::admin.btn.import'),
             'export_btn' => trans('brackets/admin-translations::admin.btn.export'),
