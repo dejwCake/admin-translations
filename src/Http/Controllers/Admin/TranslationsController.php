@@ -61,7 +61,7 @@ final class TranslationsController extends BaseController
                         $query->whereGroup($request->group);
                     }
                 },
-        );
+            );
 
         $locales = $translatable->getLocales();
         $userLocale = isset($request->user()->language)

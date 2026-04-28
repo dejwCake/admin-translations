@@ -21,7 +21,7 @@ class ExportTest extends TestCase
 
     public function testRequiresExportLanguages(): void
     {
-        $this->authorizedToEdit();
+        $this->authorizedToIndex();
 
         $this->getJson('/admin/translations/export')
             ->assertStatus(422)
@@ -30,7 +30,7 @@ class ExportTest extends TestCase
 
     public function testExportLanguagesMustBeArray(): void
     {
-        $this->authorizedToEdit();
+        $this->authorizedToIndex();
 
         $this->getJson('/admin/translations/export?exportLanguages=en')
             ->assertStatus(422)
@@ -39,7 +39,7 @@ class ExportTest extends TestCase
 
     public function testPassesValidationAndReturnsDownload(): void
     {
-        $this->authorizedToEdit();
+        $this->authorizedToIndex();
 
         $response = $this->get('/admin/translations/export?' . http_build_query([
             'exportLanguages' => ['en', 'sk'],
@@ -51,7 +51,7 @@ class ExportTest extends TestCase
 
     public function testGetExportLanguagesLowercasesValues(): void
     {
-        $this->authorizedToEdit();
+        $this->authorizedToIndex();
 
         $response = $this->get('/admin/translations/export?' . http_build_query([
             'exportLanguages' => ['EN', 'Sk'],
@@ -61,10 +61,10 @@ class ExportTest extends TestCase
         $response->assertDownload();
     }
 
-    private function authorizedToEdit(): void
+    private function authorizedToIndex(): void
     {
         $this->actingAs(new User(), 'admin');
         Gate::define('admin', static fn () => true);
-        Gate::define('admin.translation.edit', static fn () => true);
+        Gate::define('admin.translation.index', static fn () => true);
     }
 }

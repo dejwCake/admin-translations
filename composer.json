@@ -44,8 +44,8 @@
     },
     "require-dev": {
         "larastan/larastan": "^3.9",
-        "orchestra/testbench": "^11.0",
-        "phpunit/phpunit": "^13.0"
+        "orchestra/testbench": "^11.1",
+        "phpunit/phpunit": "^13.1"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
