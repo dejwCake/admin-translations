@@ -40,7 +40,7 @@
         "illuminate/contracts": "^13.0",
         "illuminate/database": "^13.0",
         "illuminate/support": "^13.0",
-        "maatwebsite/excel": "4.x-dev@dev"
+        "maatwebsite/excel": "4.x-dev"
     },
     "require-dev": {
         "larastan/larastan": "^3.9",
