@@ -64,7 +64,8 @@ final class AdminTranslationsInstall extends Command
             $this->app->configPath('app.php'),
             '\'providers\' => ServiceProvider::defaultProviders()->merge([',
             '\'providers\' => ServiceProvider::defaultProviders()->replace([
-        \Illuminate\Translation\TranslationServiceProvider::class => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,
+        \Illuminate\Translation\TranslationServiceProvider::class
+        => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,
     ])->merge([',
             '|TranslationServiceProvider::class|',
         );
@@ -73,7 +74,8 @@ final class AdminTranslationsInstall extends Command
             $this->app->configPath('app.php'),
             '];',
             '   \'providers\' => \Illuminate\Support\ServiceProvider::defaultProviders()->replace([
-        \Illuminate\Translation\TranslationServiceProvider::class => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,
+        \Illuminate\Translation\TranslationServiceProvider::class
+        => \Brackets\AdminTranslations\Providers\TranslationServiceProvider::class,
     ])->toArray(),
 ];',
             '|\'providers\'|',
