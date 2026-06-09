@@ -10,14 +10,17 @@ Route::middleware(['auth:' . config('admin-auth.defaults.guard')])
     ->prefix('/admin/translations')
     ->name('admin/translations/')
     ->group(static function (): void {
-        Route::get('/', [TranslationsController::class, 'index']);
+        Route::get('/', [TranslationsController::class, 'index'])
+            ->name('index');
         Route::get('/export', [TranslationsController::class, 'export'])
             ->name('export');
         Route::post('/import', [TranslationsController::class, 'import'])
             ->name('import');
         Route::post('/import/conflicts', [TranslationsController::class, 'importResolvedConflicts'])
             ->name('import/conflicts');
-        Route::post('/rescan', [RescanTranslationsController::class, 'rescan']);
+        Route::post('/rescan', [RescanTranslationsController::class, 'rescan'])
+            ->name('rescan');
 
-        Route::post('/{translation}', [TranslationsController::class, 'update']);
+        Route::post('/{translation}', [TranslationsController::class, 'update'])
+            ->name('update');
     });
