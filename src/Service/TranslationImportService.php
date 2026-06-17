@@ -35,7 +35,7 @@ final readonly class TranslationImportService
     }
 
     /**
-     * @param array<string, string> $row
+     * @param array<string, string|bool> $row
      */
     public function buildKeyForArray(array $row): string
     {
@@ -52,7 +52,7 @@ final readonly class TranslationImportService
     }
 
     /**
-     * @param array<string, string|int> $row
+     * @param array<string, string|int|bool> $row
      * @param array<string, array{id: int, text?: array<string, string>}> $array
      */
     public function rowValueEqualsValueInArray(array $row, array $array, string $chosenLanguage): bool

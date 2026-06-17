@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Models;
 
+use Brackets\AdminTranslations\Observers\TranslationObserver;
 use Carbon\CarbonInterface;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Database\Eloquent\Attributes\Guarded;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Arr;
-use Override;
 
 /**
  * @property int $id
@@ -23,41 +25,14 @@ use Override;
  * @property CarbonInterface $updated_at
  * @property CarbonInterface $deleted_at
  */
+#[Guarded(['id'])]
+#[ObservedBy(TranslationObserver::class)]
 class Translation extends Model
 {
     use SoftDeletes;
 
     /** @var array<string> */
     public array $translatable = ['text'];
-
-    /**
-     * @var array<string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    public $guarded = ['id'];
-
-    /**
-     * @var array<string, string>
-     * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
-     */
-    protected $casts = ['text' => 'array'];
-
-    /**
-     * Boot method to declare event handlers
-     */
-    #[Override]
-    public static function boot(): void
-    {
-        parent::boot();
-
-        static::saved(static function (self $translation): void {
-            $translation->flushGroupCache();
-        });
-
-        static::deleted(static function (self $translation): void {
-            $translation->flushGroupCache();
-        });
-    }
 
     /**
      * @return array<string, string>
@@ -116,7 +91,7 @@ class Translation extends Model
     /**
      * Flush cache
      */
-    protected function flushGroupCache(): void
+    public function flushGroupCache(): void
     {
         $cache = app(Cache::class);
         assert($cache instanceof Cache);
@@ -124,6 +99,14 @@ class Translation extends Model
         foreach ($this->getTranslatedLocales() as $locale) {
             $cache->forget(static::getCacheKey($this->namespace ?? '*', $this->group, $locale));
         }
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return ['text' => 'array'];
     }
 
     /**
