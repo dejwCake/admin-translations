@@ -67,7 +67,7 @@ final class AdminTranslationsServiceProvider extends ServiceProvider
         }
 
         $this->publishes([
-            __DIR__ . '/../lang' => $this->app->langPath('vendor/courier'),
+            __DIR__ . '/../lang' => $this->app->langPath('vendor/brackets/admin-translations'),
         ], 'lang');
     }
 }
