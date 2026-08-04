@@ -6,8 +6,3 @@ parameters:
 			count: 1
 			path: config/auth.providers.admin_users.php
 
-		-
-			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
-			identifier: larastan.noEnvCallsOutsideOfConfig
-			count: 7
-			path: tests/TestCase.php

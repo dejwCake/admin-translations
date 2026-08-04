@@ -13,6 +13,7 @@ use Brackets\Translatable\TranslatableServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Env;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
@@ -90,7 +91,7 @@ abstract class TestCase extends Orchestra
         $app['config']->set('admin-listing.with-translations-class', WithTranslations::class);
         $app['config']->set('translatable.locales', ['en', 'sk']);
 
-        match (env('DB_CONNECTION')) {
+        match (Env::get('DB_CONNECTION')) {
             'pgsql' => $this->configurePgsql($app),
             'mysql' => $this->configureMysql($app),
             default => $this->configureSqlite($app),
@@ -121,9 +122,9 @@ abstract class TestCase extends Orchestra
             'driver' => 'pgsql',
             'host' => 'pgsql',
             'port' => '5432',
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', 'bestsecret'),
+            'database' => Env::get('DB_DATABASE', 'laravel'),
+            'username' => Env::get('DB_USERNAME', 'root'),
+            'password' => Env::get('DB_PASSWORD', 'bestsecret'),
             'charset' => 'utf8',
             'prefix' => '',
             'schema' => 'public',
@@ -138,9 +139,9 @@ abstract class TestCase extends Orchestra
             'driver' => 'mysql',
             'host' => 'mysql',
             'port' => '3306',
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
-            'password' => env('DB_PASSWORD', 'bestsecret'),
+            'database' => Env::get('DB_DATABASE', 'laravel'),
+            'username' => Env::get('DB_USERNAME', 'root'),
+            'password' => Env::get('DB_PASSWORD', 'bestsecret'),
             'charset' => 'utf8',
             'prefix' => '',
             'schema' => 'public',
