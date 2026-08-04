@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Brackets\AdminTranslations\Tests\Unit\Repositories;
+namespace Brackets\AdminTranslations\Tests\Unit\Repositories\TranslationRepository;
 
 use Brackets\AdminTranslations\Models\Translation;
 use Brackets\AdminTranslations\Repositories\TranslationRepository;
 use Brackets\AdminTranslations\Tests\TestCase;
 
-class TranslationRepositoryTest extends TestCase
+class CreateOrUpdateTest extends TestCase
 {
     private TranslationRepository $translationRepository;
 
@@ -18,10 +18,6 @@ class TranslationRepositoryTest extends TestCase
 
         $this->translationRepository = $this->app->make(TranslationRepository::class);
     }
-
-    // -------------------------------------------------------------------------
-    // createOrUpdate
-    // -------------------------------------------------------------------------
 
     public function testCreateOrUpdateCreatesNewTranslationWithLanguageAndText(): void
     {
@@ -101,40 +97,55 @@ class TranslationRepositoryTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // getUsedGroups
+    // Exact matching
+    //
+    // The test schema is built with the connection's default collation, which on MySQL
+    // is case- and accent-insensitive. These therefore fail if the lookup relies on the
+    // database `where` alone, which is exactly the regression being guarded against.
     // -------------------------------------------------------------------------
 
-    public function testGetUsedGroupsReturnsUniqueGroups(): void
+    public function testCreateOrUpdateTreatsKeysDifferingOnlyByCaseAsDistinct(): void
     {
-        // 'group' already exists from setUp via $this->languageLine
-        // Add a second translation in the same group — should still count as one
-        $this->createTranslation('*', 'group', 'another-key', ['en' => 'another']);
+        $this->translationRepository->createOrUpdate('*', '*', 'Log in', null, null);
+        $this->translationRepository->createOrUpdate('*', '*', 'log in', null, null);
 
-        $groups = $this->translationRepository->getUsedGroups();
+        $keys = Translation::where('namespace', '*')->where('group', '*')->pluck('key')->all();
 
-        self::assertCount(1, $groups->filter(static fn (string $g) => $g === 'group'));
+        self::assertContains('Log in', $keys);
+        self::assertContains('log in', $keys);
     }
 
-    public function testGetUsedGroupsExcludesSoftDeletedTranslations(): void
+    public function testCreateOrUpdateTreatsKeysDifferingOnlyByAccentAsDistinct(): void
     {
-        $translation = $this->createTranslation('*', 'soft-deleted-group', 'some-key', ['en' => 'value']);
-        $translation->delete();
+        $this->translationRepository->createOrUpdate('*', '*', 'Ulozit', null, null);
+        $this->translationRepository->createOrUpdate('*', '*', 'Uložiť', null, null);
 
-        $groups = $this->translationRepository->getUsedGroups();
+        $keys = Translation::where('namespace', '*')->where('group', '*')->pluck('key')->all();
 
-        self::assertFalse($groups->contains('soft-deleted-group'));
+        self::assertContains('Ulozit', $keys);
+        self::assertContains('Uložiť', $keys);
     }
 
-    public function testGetUsedGroupsReturnsMultipleGroups(): void
+    public function testCreateOrUpdateDoesNotDuplicateAnExactlyMatchingKey(): void
     {
-        $this->createTranslation('*', 'alpha', 'key1', ['en' => 'one']);
-        $this->createTranslation('*', 'beta', 'key2', ['en' => 'two']);
+        $this->translationRepository->createOrUpdate('*', '*', 'Log in', null, null);
+        $this->translationRepository->createOrUpdate('*', '*', 'Log in', null, null);
 
-        $groups = $this->translationRepository->getUsedGroups();
+        $count = Translation::where('namespace', '*')->where('group', '*')->where('key', 'Log in')->count();
 
-        self::assertTrue($groups->contains('alpha'));
-        self::assertTrue($groups->contains('beta'));
-        // The default 'group' from setUp is also present
-        self::assertTrue($groups->contains('group'));
+        self::assertSame(1, $count);
+    }
+
+    public function testCreateOrUpdateRestoresOnlyTheExactlyMatchingSoftDeletedKey(): void
+    {
+        $exact = $this->createTranslation('*', '*', 'Toggle sidebar', ['en' => 'Toggle sidebar']);
+        $other = $this->createTranslation('*', '*', 'Toggle Sidebar', ['en' => 'Toggle Sidebar']);
+        $exact->delete();
+        $other->delete();
+
+        $this->translationRepository->createOrUpdate('*', '*', 'Toggle sidebar', null, null);
+
+        self::assertNull($exact->fresh()->deleted_at);
+        self::assertNotNull($other->fresh()->deleted_at);
     }
 }

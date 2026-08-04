@@ -21,16 +21,11 @@ final readonly class TranslationRepository
         ?string $language,
         ?string $text,
     ): void {
-        $translation = Translation::withTrashed()
-            ->where('namespace', $namespace)
-            ->where('group', $group)
-            ->where('key', $key)
-            ->first();
+        $translation = $this->findExact($namespace, $group, $key);
 
         $defaultLocale = (string) $this->config->get('app.locale');
 
         if ($translation !== null) {
-            assert($translation instanceof Translation);
             if (!$this->isCurrentTransForTranslationArray($translation, $defaultLocale)) {
                 $translation->restore();
             }
@@ -54,6 +49,28 @@ final readonly class TranslationRepository
         return Translation::whereNull('deleted_at')
             ->groupBy('group')
             ->pluck('group');
+    }
+
+    /**
+     * Find the translation whose namespace, group and key match exactly.
+     *
+     * The `where` clauses alone are not enough: under a case- or accent-insensitive
+     * collation (MySQL's `utf8mb4_unicode_ci`, for example) `Log in` and `log in`, or
+     * `Uložiť` and `Ulozit`, compare equal. That made the caller take its "already
+     * exists" branch and restore an unrelated row, so the key being scanned never got one
+     * of its own. Re-checking in PHP keeps the behaviour identical on every driver and
+     * collation.
+     */
+    private function findExact(string $namespace, string $group, string $key): ?Translation
+    {
+        return Translation::withTrashed()
+            ->where('namespace', $namespace)
+            ->where('group', $group)
+            ->where('key', $key)
+            ->get()
+            ->first(static fn (Translation $candidate): bool => $candidate->namespace === $namespace
+                && $candidate->group === $group
+                && $candidate->key === $key);
     }
 
     private function isCurrentTransForTranslationArray(Translation $translation, string $locale): bool
