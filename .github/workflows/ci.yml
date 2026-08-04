@@ -58,40 +58,49 @@ jobs:
           --baseline-file phpmd.baseline.xml
 
   tests:
-    name: Tests
+    name: Tests (${{ matrix.db }})
     needs: [phpcs, phpcs-compatibility, phpstan, phpmd]
     runs-on: ubuntu-latest
+    strategy:
+      # Report both databases even when one fails.
+      fail-fast: false
+      matrix:
+        include:
+          - db: pgsql
+            port: 5432
+          - db: mysql
+            port: 3306
     container:
       image: dejwcake/php8.5:1
       env:
-        DB_CONNECTION: pgsql
-        DB_HOST: pgsql
-        DB_PORT: 5432
+        DB_CONNECTION: ${{ matrix.db }}
+        DB_HOST: ${{ matrix.db }}
+        DB_PORT: ${{ matrix.port }}
         DB_DATABASE: laravel
-        DB_USERNAME: root
+        DB_USERNAME: laravel
         DB_PASSWORD: bestsecret
     services:
       pgsql:
         image: dejwcake/postgres18:1
         env:
           POSTGRES_DB: laravel
-          POSTGRES_USER: root
+          POSTGRES_USER: laravel
           POSTGRES_PASSWORD: bestsecret
           PGPASSWORD: bestsecret
         options: >-
-          --health-cmd="pg_isready -U root -d laravel"
+          --health-cmd="pg_isready -h 127.0.0.1 -U laravel -d laravel"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
       mysql:
-        image: dejwcake/mariadb12.1:1
+        image: dejwcake/mariadb12.2:1
         env:
           MYSQL_DATABASE: laravel
           MYSQL_USER: laravel
           MYSQL_PASSWORD: bestsecret
           MYSQL_ROOT_PASSWORD: bestsecret
         options: >-
-          --health-cmd="mariadb-admin ping -h 127.0.0.1 -u root -pbestsecret"
+          --health-cmd="mariadb-admin ping -h 127.0.0.1 -u laravel -pbestsecret"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5

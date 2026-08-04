@@ -2,28 +2,52 @@ services:
   test:
     image: dejwcake/php8.5:1
     environment:
-      DB_CONNECTION: mysql
+      DB_CONNECTION: "${DB_CONNECTION:-mysql}"
+      DB_DATABASE: "${DB_DATABASE:-laravel}"
+      DB_USERNAME: "${DB_USERNAME:-laravel}"
+      DB_PASSWORD: "${DB_PASSWORD:-bestsecret}"
     volumes:
       - .:/var/www/html:delegated
     depends_on:
-      - pgsql
-      - mysql
+      pgsql:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
 
   pgsql:
     image: dejwcake/postgres18:1
     environment:
       POSTGRES_DB: "${DB_DATABASE:-laravel}"
-      POSTGRES_USER: "${DB_USERNAME:-root}"
+      POSTGRES_USER: "${DB_USERNAME:-laravel}"
       POSTGRES_PASSWORD: "${DB_PASSWORD:-bestsecret}"
       PGPASSWORD: "${DB_PASSWORD:-bestsecret}"
+    # Checked over TCP, not the unix socket: during init postgres runs a socket-only
+    # temporary server, and a socket check would report ready too early.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   mysql:
-    image: dejwcake/mariadb12.1:1
+    image: dejwcake/mariadb12.2:1
     environment:
       MYSQL_DATABASE: "${DB_DATABASE:-laravel}"
-      MYSQL_USER: "${DB_USERNAME:-root}"
+      MYSQL_USER: "${DB_USERNAME:-laravel}"
       MYSQL_PASSWORD: "${DB_PASSWORD:-bestsecret}"
-      MYSQL_ROOT_PASSWORD: "${DB_PASSWORD:-bestsecret}"
+      # Required by the entrypoint even though the tests never use it. Must differ from
+      # MYSQL_USER: asking it to create 'root' aborts init with "CREATE USER failed".
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-bestsecret}"
+    # Same reasoning as pgsql — the init-time temporary server runs with --skip-networking,
+    # so a TCP ping only succeeds once the real server is up. Pinging as MYSQL_USER also
+    # proves the entrypoint finished creating the application account.
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -u $$MYSQL_USER -p\"$$MYSQL_PASSWORD\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   php-qa:
     image: dejwcake/phpqa8.5:1

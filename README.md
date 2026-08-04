@@ -50,24 +50,6 @@ Composer normalization:
 docker compose run -it --rm php-qa composer normalize
 ```
 
-### Run tests
-
-Run tests with pcov:
-```shell
-docker compose run -it --rm test ./vendor/bin/phpunit -d pcov.enabled=1
-```
-
-To regenerate snapshots use:
-```shell
-docker compose run -it --rm test ./vendor/bin/phpunit -d pcov.enabled=1 -d --update-snapshots
-```
-
-To switch between postgresql and mariadb change in `docker-compose.yml` DB_CONNECTION environmental variable:
-```git
-- DB_CONNECTION: pgsql
-+ DB_CONNECTION: mysql
-```
-
 ### Run code analysis tools (php-qa)
 
 PHP compatibility:
@@ -93,4 +75,35 @@ docker compose run -it --rm php-qa phpstan analyse --configuration=phpstan.neon
 Mess detector (phpmd):
 ```shell
 docker compose run -it --rm php-qa phpmd ./config,./database,./lang,./resources,./routes,./src,./tests ansi phpmd.xml --suffixes php --baseline-file phpmd.baseline.xml
+```
+
+### Run tests
+
+Run tests against mariadb:
+```shell
+docker compose run -it --rm -e DB_CONNECTION=mysql test ./vendor/bin/phpunit
+```
+
+Run tests against postgresql:
+```shell
+docker compose run -it --rm -e DB_CONNECTION=pgsql test ./vendor/bin/phpunit
+```
+
+Run tests with coverage:
+```shell
+docker compose run -it --rm test ./vendor/bin/phpunit --coverage-text
+```
+
+### Run the whole PHP suite
+
+Run every PHP check and the test suite against both databases in sequence (stops at the first failure):
+```shell
+docker compose run -it --rm test composer update \
+  && docker compose run -it --rm php-qa composer normalize \
+  && docker compose run -it --rm php-qa phpcs --standard=.phpcs.compatibility.xml --cache=.phpcs.cache \
+  && docker compose run -it --rm php-qa phpcs -s --colors --extensions=php \
+  && docker compose run -it --rm php-qa phpstan analyse --configuration=phpstan.neon \
+  && docker compose run -it --rm php-qa phpmd ./config,./database,./lang,./resources,./routes,./src,./tests ansi phpmd.xml --suffixes php --baseline-file phpmd.baseline.xml \
+  && docker compose run -it --rm -e DB_CONNECTION=mysql test ./vendor/bin/phpunit \
+  && docker compose run -it --rm -e DB_CONNECTION=pgsql test ./vendor/bin/phpunit
 ```
