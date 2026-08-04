@@ -244,3 +244,88 @@ The install command now uses `fa fa-language` instead of `icon-location-pin` for
 7. Update published Blade views to use Vue component syntax (or re-publish)
 8. Update sidebar icon from `icon-location-pin` to `fa fa-language`
 9. Ensure `@dejwcake/craftable` frontend package is installed with translation components
+
+---
+
+# Upgrade Guide: 2.1.x to 2.2
+
+**Not a breaking release.** The public API is unchanged and no code changes are required. There are
+three behaviour changes worth knowing about before you upgrade, and one new migration to run.
+
+`TranslationsScanner::__construct()` gained an optional `Config` argument. The container injects it
+automatically, and `new TranslationsScanner($disk)` keeps working — without a config there is no
+extension list, so it scans every file exactly as 2.1.x did.
+
+## Behaviour Changes
+
+### 1. Only Source File Extensions Are Scanned
+
+`scanned_directories` previously read **every** file it found, whatever the extension. It now reads
+only those listed in the new `scanned_extensions` config key, defaulting to `php`, `vue`, `js`, `jsx`,
+`ts`, `tsx`.
+
+**Action required:** if you keep translation calls in any other file type — `.twig`, `.md`, `.txt`,
+a templating language of your own — add its extension to `scanned_extensions`, or set the key to an
+empty array to restore the old scan-everything behaviour. Otherwise those keys silently stop being
+collected and their rows are soft-deleted on the next scan.
+
+### 2. Keys Containing Escaped Quotes Change Spelling
+
+The scanner now unescapes what it captures, so the stored key matches the string `__()` receives at
+runtime.
+
+```php
+__('C:\\path')     // 2.1.x stored: C:\\path      next stores: C:\path
+```
+
+Two related changes in the same area: calls with replacement parameters, calls wrapped over several
+lines, and strings containing an escaped quote are now collected at all (they were silently skipped);
+and JavaScript method calls such as `i18n.__('x')` are no longer collected (they were a false
+positive).
+
+**Action required:** any existing row whose key held a backslash escape will be soft-deleted and
+recreated under its new spelling, orphaning the translations attached to it. Rare, but check with
+`SELECT * FROM translations WHERE \`key\` LIKE '%\\\\%'` before upgrading if you use such keys.
+
+### 3. Translation Key Columns Are Now Case- and Accent-Sensitive
+
+A new migration, `make_translation_keys_case_sensitive`, switches `namespace`, `group` and `key` to
+`utf8mb4_bin` on MySQL and MariaDB. PostgreSQL and SQLite already compare text exactly and are left
+untouched.
+
+```sql
+-- before: utf8mb4_unicode_ci (or utf8mb4_uca1400_ai_ci)
+'Log in'  = 'log in'   -- true
+'Uložiť'  = 'Ulozit'   -- true
+
+-- after: utf8mb4_bin
+'Log in'  = 'log in'   -- false
+'Uložiť'  = 'Ulozit'   -- false
+```
+
+Under the old collation two genuinely different keys collided, and only one of them could ever have a
+row: `admin-translations:scan-and-save` would report more translations than it stored.
+
+Listing search is unaffected — `admin-listing` normalises the comparison itself rather than relying on
+the column collation, so searching stays case- **and** accent-insensitive.
+
+**Action required:** run `php artisan vendor:publish --tag=migrations` to pick up the new migration,
+then `php artisan migrate`.
+
+> **Warning — customised columns.** The migration writes the full column definition, using the
+> package's own shape: `VARCHAR(255)` for `namespace` and `group` (with `namespace` defaulting to
+> `'*'`), and `TEXT` for `key`. If your application has altered any of those — a wider type, a
+> different default, a changed nullability — **the migration will reset them to the package's
+> definition.** Check the table before migrating, and adjust the published migration if you have
+> customised it. `down()` restores `utf8mb4_unicode_ci` but likewise rewrites the definitions.
+
+## Migration Steps Summary (2.1.x to next)
+
+1. Run `composer update`
+2. Add `scanned_extensions` to your published `admin-translations.php` config if you scan
+   non-standard file types (see §1)
+3. Check for keys containing backslash escapes (see §2)
+4. Publish and run the new migration: `php artisan vendor:publish --tag=migrations` then
+   `php artisan migrate` — first reading the warning in §3 if you have customised the
+   `translations` column definitions
+5. Re-run `php artisan admin-translations:scan-and-save`

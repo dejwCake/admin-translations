@@ -7,6 +7,7 @@ namespace Brackets\AdminTranslations\Tests\Unit\Scanner;
 use Brackets\AdminTranslations\Scanner\TranslationsScanner;
 use Brackets\AdminTranslations\Tests\TestCase;
 use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -120,6 +121,18 @@ class TranslationsScannerTest extends TestCase
     public function testIgnoresUnsupportedCallShapes(string $notExpected): void
     {
         self::assertNotContains($notExpected, $this->scanCasesDirectory());
+    }
+
+    public function testItCanStillBeConstructedWithoutAConfigRepository(): void
+    {
+        $scanner = new TranslationsScanner(new Filesystem());
+        $scanner->addScannedPath($this->casesDir);
+
+        [$trans, $underscore] = $scanner->getAllViewFilesWithTranslations();
+        $collected = $trans->merge($underscore)->all();
+
+        self::assertContains('Markdown must not be scanned', $collected);
+        self::assertContains('Vue plain', $collected);
     }
 
     public function testEmptyExtensionListScansEveryFile(): void

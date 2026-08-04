@@ -11,6 +11,27 @@ This package is part of [Craftable](https://github.com/dejwCake/craftable) (`dej
 ## Documentation
 You can find full documentation at https://docs.getcraftable.com/#/admin-translations
 
+## Translation key collation
+
+A translation is identified by its `namespace`, `group` and `key`. Those three columns are stored
+with a **case- and accent-sensitive** collation (`utf8mb4_bin` on MySQL and MariaDB; PostgreSQL and
+SQLite compare text exactly by default), because `Log in` and `log in`, or `Uložiť` and `Ulozit`, are
+different keys and each needs its own row.
+
+This matters because the usual Laravel default, `utf8mb4_unicode_ci`, is insensitive to both. Under
+it the two spellings collide, only one of them can ever be stored, and
+`admin-translations:scan-and-save` reports more translations than it saved.
+
+Searching in the admin UI is **not** affected: `admin-listing` normalises the comparison itself
+instead of relying on the column collation, so search stays case- and accent-insensitive on every
+driver.
+
+> **Warning — customised columns.** The `make_translation_keys_case_sensitive` migration writes the
+> full column definition, using the package's own shape: `VARCHAR(255)` for `namespace` and `group`
+> (with `namespace` defaulting to `'*'`), and `TEXT` for `key`. If your application has altered any of
+> those — a wider type, a different default, a changed nullability — **the migration will reset them
+> to the package's definition.** Check the table first and adjust the published migration if needed.
+
 ## Issues
 Where do I report issues?
 If something is not working as expected, please open an issue in the main repository https://github.com/dejwCake/craftable.

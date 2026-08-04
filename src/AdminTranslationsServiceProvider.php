@@ -66,6 +66,20 @@ final class AdminTranslationsServiceProvider extends ServiceProvider
             ], 'migrations');
         }
 
+        if (!glob($this->app->basePath('database/migrations/*_make_translation_keys_case_sensitive.php'))) {
+            // A second after the create migration, so ordering still holds when a fresh
+            // install publishes both in the same run
+            $timestamp = date('Y_m_d_His', time() + 1);
+            $this->publishes([
+                __DIR__ . '/../database/migrations/make_translation_keys_case_sensitive.php'
+                => sprintf(
+                    '%s/%s_make_translation_keys_case_sensitive.php',
+                    $this->app->databasePath('migrations'),
+                    $timestamp,
+                ),
+            ], 'migrations');
+        }
+
         $this->publishes([
             __DIR__ . '/../lang' => $this->app->langPath('vendor/brackets/admin-translations'),
         ], 'lang');

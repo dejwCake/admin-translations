@@ -23,7 +23,7 @@ final class TranslationsScanner
      */
     private Collection $scannedPaths;
 
-    public function __construct(private readonly Filesystem $disk, private readonly Config $config)
+    public function __construct(private readonly Filesystem $disk, private readonly ?Config $config = null)
     {
         $this->scannedPaths = new Collection([]);
     }
@@ -217,7 +217,7 @@ final class TranslationsScanner
      */
     private function isScannable(SplFileInfo $file): bool
     {
-        $extensions = (array) $this->config->get('admin-translations.scanned_extensions', []);
+        $extensions = (array) ($this->config?->get('admin-translations.scanned_extensions', []) ?? []);
 
         if ($extensions === []) {
             return true;
