@@ -27,14 +27,18 @@ But some are false positive
 {{ trans('A translation can have a period. It\'s okay.') }}
 {{ trans("go od.key2") }}
 
+Escaped quotes are collected too. The scanner unescapes them, so the stored key is the
+string __() actually receives at runtime.
+
+{{ __("Escaped \" double quote") }}
+{{ __("Escaped \" double \" quote twice") }}
+{{ __('Escaped \' single quote') }}
+{{ __('Escaped \' single \' quote twice') }}
+
 Bad patterns
 {{ __("Bad " . " pattern double quote 1") }}
 {{ __("Bad " . $a . " pattern double quote 2") }}
-{{ __("Bad \" pattern double quote 3") }}
-{{ __("Bad \" pattern double quote \" 4") }}
 {{ __("") }}
 {{ __('Bad ' . ' pattern single quote 1') }}
 {{ __('Bad ' . $a . ' pattern single quote 2') }}
-{{ __('Bad \' pattern single quote 3') }}
-{{ __('Bad \' pattern single quote \' 4') }}
 {{ __('') }}

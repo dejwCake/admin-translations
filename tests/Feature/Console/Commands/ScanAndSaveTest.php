@@ -14,7 +14,7 @@ class ScanAndSaveTest extends TestCase
         // Config sets scanned_directories to tests/fixtures/views in TestCase::getEnvironmentSetUp
         $this->artisan('admin-translations:scan-and-save')
             ->assertSuccessful()
-            ->expectsOutputToContain('15 translations saved');
+            ->expectsOutputToContain('19 translations saved');
 
         self::assertGreaterThan(0, Translation::count());
     }
@@ -25,7 +25,7 @@ class ScanAndSaveTest extends TestCase
 
         $this->artisan('admin-translations:scan-and-save', ['paths' => [$viewsDir]])
             ->assertSuccessful()
-            ->expectsOutputToContain('15 translations saved');
+            ->expectsOutputToContain('19 translations saved');
     }
 
     public function testWithEmptyDirectorySavesZeroTranslations(): void

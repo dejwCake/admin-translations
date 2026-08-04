@@ -34,7 +34,7 @@ class ScanAndSaveServiceTest extends TestCase
         // trans(): good.key1, good.key2, good.key6 with a space, admin::auth.key7, brackets/admin-ui::auth.key8 = 5
         // __(): Good key 3, Good 'key' 4, " ", "  ", Good "key" 5, Good. Key.,
         // File, Good, <strong>Good</strong>, Good (better) = 10
-        self::assertSame(15, $count);
+        self::assertSame(19, $count);
     }
 
     public function testScanAndSaveCreatesTranslationRecords(): void

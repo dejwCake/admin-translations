@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\Scanner;
 
+use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
+use SplFileInfo;
 
 /*
  * This class is a fork from themsaid/laravel-langman and adjusted to our purpose.
@@ -21,7 +23,7 @@ final class TranslationsScanner
      */
     private Collection $scannedPaths;
 
-    public function __construct(private readonly Filesystem $disk)
+    public function __construct(private readonly Filesystem $disk, private readonly Config $config)
     {
         $this->scannedPaths = new Collection([]);
     }
@@ -60,12 +62,17 @@ final class TranslationsScanner
             // See https://regex101.com/r/jS5fX0/4
             // Must not start with any alphanum or _
             '[^\w]' .
-            // Must not start with ->
+            // Must not be a method call: `->` covers PHP ($obj->__()), `.` covers
+            // JS/TS dot syntax (i18n.__())
             '(?<!->)' .
+            '(?<!\\.)' .
             // Must start with one of the functions
             '(' . implode('|', $functions) . ')' .
             // Match opening parentheses
             "\(" .
+            // Allow whitespace/newlines before the string, so calls wrapped over
+            // several lines are matched too
+            '\s*' .
             // Match " or '
             "[\'\"]" .
             // Start a new group to match:
@@ -79,68 +86,77 @@ final class TranslationsScanner
             ')' .
             // Closing quote
             "[\'\"]" .
-            // Close parentheses or new parameter
-            "[\),]"
+            // Close parentheses or new parameter, possibly after whitespace
+            '\s*[\),]'
         ;
 
         $patternB =
             // See https://regex101.com/r/2EfItR/2
             // Must not start with any alphanum or _
             '[^\w]' .
-            // Must not start with ->
+            // Must not be a method call: `->` covers PHP ($obj->__()), `.` covers
+            // JS/TS dot syntax (i18n.__())
             '(?<!->)' .
+            '(?<!\\.)' .
             // Must start with one of the functions
             '(__|Lang::getFromJson)' .
             // Match opening parentheses
             '\(' .
+            // Allow whitespace/newlines before the string, so calls wrapped over
+            // several lines are matched too
+            '\s*' .
 
             // Match "
             '[\"]' .
             // Start a new group to match:
             '(' .
-            //Can have everything except "
-            '[^"]+' .
-            //Can have everything except " or can have escaped " like \", however it is not working as expected
-//            '(?:[^"]|\\")+' .
+            // Anything except " or \, or any backslash-escaped character. Excluding the
+            // backslash from the negated class is what keeps the alternation unambiguous
+            // (a plain [^"] would also match \, so the two branches could both apply).
+            '(?:[^"\\\\]|\\\\.)+' .
             // Close group
             ')' .
             // Closing quote
             '[\"]' .
-            // Optional comma
-            '(?:,\s*)?' .
 
-            // Close parentheses or new parameter
-            '[\)]'
+            // Close parentheses or a further argument, possibly after whitespace. A
+            // literal ) or , is required so that string concatenation -- __("a" . "b")
+            // -- is still rejected.
+            '\s*[,\)]'
         ;
 
         $patternC =
             // See https://regex101.com/r/VaPQ7A/2
             // Must not start with any alphanum or _
             '[^\w]' .
-            // Must not start with ->
+            // Must not be a method call: `->` covers PHP ($obj->__()), `.` covers
+            // JS/TS dot syntax (i18n.__())
             '(?<!->)' .
+            '(?<!\\.)' .
             // Must start with one of the functions
             '(__|Lang::getFromJson)' .
             // Match opening parentheses
             '\(' .
+            // Allow whitespace/newlines before the string, so calls wrapped over
+            // several lines are matched too
+            '\s*' .
 
             // Match '
             '[\']' .
             // Start a new group to match:
             '(' .
-            //Can have everything except '
-            "[^']+" .
-            //Can have everything except 'or can have escaped ' like \', however it is not working as expected
-//            "(?:[^']|\\')+" .
+            // Anything except ' or \, or any backslash-escaped character. See the note
+            // on the double-quoted variant above.
+            '(?:[^\'\\\\]|\\\\.)+' .
             // Close group
             ')' .
             // Closing quote
             '[\']' .
-            // Optional comma
-            '(?:,\s*)?' .
 
-            // Close parentheses or new parameter
-            '[\)]'
+            // Close parentheses or a further argument, possibly after whitespace. A
+            // literal ) or , is required so that string concatenation -- __('a' . 'b')
+            // -- is still rejected.
+            '\s*[,\)]'
         ;
 
         $trans = new Collection();
@@ -148,22 +164,65 @@ final class TranslationsScanner
 
         // FIXME maybe we can count how many times one translation is used and eventually display it to the user
 
-        foreach ($this->scannedPaths->toArray() as $dirPath) {
-            foreach ($this->disk->allFiles($dirPath) as $file) {
-                if (preg_match_all("/$patternA/siU", $file->getContents(), $matches)) {
-                    $trans->push($matches[2]);
-                }
+        foreach ($this->scannableFileContents() as $contents) {
+            if (preg_match_all("/$patternA/siU", $contents, $matches)) {
+                $trans->push($matches[2]);
+            }
 
-                if (preg_match_all("/$patternB/siU", $file->getContents(), $matches)) {
-                    $underscore->push($matches[2]);
-                }
+            if (preg_match_all("/$patternB/siU", $contents, $matches)) {
+                $underscore->push($matches[2]);
+            }
 
-                if (preg_match_all("/$patternC/siU", $file->getContents(), $matches)) {
-                    $underscore->push($matches[2]);
-                }
+            if (preg_match_all("/$patternC/siU", $contents, $matches)) {
+                $underscore->push($matches[2]);
             }
         }
 
-        return [$trans->flatten()->unique(), $underscore->flatten()->unique()];
+        return [
+            $trans->flatten()->map($this->unescape(...))->unique()->values(),
+            $underscore->flatten()->map($this->unescape(...))->unique()->values(),
+        ];
+    }
+
+    /**
+     * Turn the source-code spelling of a key into the string the application receives at
+     * runtime, e.g. `The team owner\'s role` becomes `The team owner's role`.
+     */
+    private function unescape(string $key): string
+    {
+        return preg_replace('/\\\\(.)/', '$1', $key) ?? $key;
+    }
+
+    /**
+     * The contents of every scannable file across all scanned paths.
+     *
+     * @return iterable<string>
+     */
+    private function scannableFileContents(): iterable
+    {
+        foreach ($this->scannedPaths->toArray() as $dirPath) {
+            foreach ($this->disk->allFiles($dirPath) as $file) {
+                if (!$this->isScannable($file)) {
+                    continue;
+                }
+
+                yield $file->getContents();
+            }
+        }
+    }
+
+    /**
+     * Only source files can contain translation calls. Skipping everything else keeps
+     * snapshots, images and other build artefacts from being read as text.
+     */
+    private function isScannable(SplFileInfo $file): bool
+    {
+        $extensions = (array) $this->config->get('admin-translations.scanned_extensions', []);
+
+        if ($extensions === []) {
+            return true;
+        }
+
+        return in_array(mb_strtolower($file->getExtension()), $extensions, true);
     }
 }

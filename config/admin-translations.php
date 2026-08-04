@@ -37,4 +37,21 @@ return [
         resource_path('views'),
         // here you can add your own directories
     ],
+
+    /*
+     * Only files with these extensions are scanned. Everything else in a scanned
+     * directory is skipped without being read, which keeps snapshots, images and other
+     * build artefacts out of the way.
+     *
+     * Blade templates end in `.php`, so they are already covered by `php`.
+     * Set this to an empty array to scan every file regardless of extension.
+     */
+    'scanned_extensions' => [
+        'php',
+        'vue',
+        'js',
+        'jsx',
+        'ts',
+        'tsx',
+    ],
 ];
