@@ -63,4 +63,31 @@ class GetTranslationsForGroupAndNamespaceTest extends TestCase
         self::assertIsArray($result['nested']);
         self::assertEquals('nested value', $result['nested']['key']);
     }
+
+    public function testAStarGroupRowWithNoTextIsOmitted(): void
+    {
+        $this->createTranslation('*', '*', 'Services', []);
+
+        $result = Translation::getTranslationsForGroupAndNamespace('sk', '*', '*');
+
+        self::assertArrayNotHasKey('Services', $result);
+    }
+
+    public function testAStarGroupRowDoesNotSubstituteAnotherLocale(): void
+    {
+        $this->createTranslation('*', '*', 'Contact us', ['en' => 'Contact us']);
+
+        $result = Translation::getTranslationsForGroupAndNamespace('sk', '*', '*');
+
+        self::assertArrayNotHasKey('Contact us', $result);
+    }
+
+    public function testAStarGroupRowIsReturnedForTheLocaleItActuallyHas(): void
+    {
+        $this->createTranslation('*', '*', 'Why us', ['sk' => 'Prečo my']);
+
+        $result = Translation::getTranslationsForGroupAndNamespace('sk', '*', '*');
+
+        self::assertSame('Prečo my', $result['Why us']);
+    }
 }

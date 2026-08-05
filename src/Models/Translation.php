@@ -50,10 +50,10 @@ class Translation extends Model
                         ->where('namespace', $namespace)
                         ->where('group', $group)
                         ->get()
-                        ->reject(static fn (self $translation) => $translation->getTranslation($locale, $group) === '')
+                        ->reject(static fn (self $translation) => $translation->getTranslation($locale) === '')
                         ->reduce(static function ($translations, self $translation) use ($locale, $group) {
                             if ($group === '*') {
-                                $translations[$translation->key] = $translation->getTranslation($locale, $group);
+                                $translations[$translation->key] = $translation->getTranslation($locale);
                             } else {
                                 Arr::set($translations, $translation->key, $translation->getTranslation($locale));
                             }
@@ -68,6 +68,9 @@ class Translation extends Model
         return sprintf('brackets.admin-translations.%s.%s.%s', $namespace, $group, $locale);
     }
 
+    /**
+     * Passing `$group` is deprecated and will be removed in 3.0.
+     */
     public function getTranslation(string $locale, ?string $group = null): string
     {
         if ($group === '*' && !isset($this->text[$locale])) {

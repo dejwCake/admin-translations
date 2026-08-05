@@ -319,13 +319,33 @@ then `php artisan migrate`.
 > definition.** Check the table before migrating, and adjust the published migration if you have
 > customised it. `down()` restores `utf8mb4_unicode_ci` but likewise rewrites the definitions.
 
-## Migration Steps Summary (2.1.x to next)
+### 4. Scanned Rows No Longer Shadow File Translations
 
-1. Run `composer update`
-2. Add `scanned_extensions` to your published `admin-translations.php` config if you scan
-   non-standard file types (see §1)
-3. Check for keys containing backslash escapes (see §2)
-4. Publish and run the new migration: `php artisan vendor:publish --tag=migrations` then
-   `php artisan migrate` — first reading the warning in §3 if you have customised the
-   `translations` column definitions
-5. Re-run `php artisan admin-translations:scan-and-save`
+`admin-translations:scan-and-save` stores every key it finds with an empty `text`. Those rows used to
+win over the JSON dictionaries, so scanning a project silently replaced every file translation with
+the English source: `lang/sk.json` said `Služby`, the page rendered `Services`.
+
+The translation loader now ignores a row for a locale it has no text for, so an untranslated row stays
+out of the way until somebody fills it in.
+
+**Action required:** none. If you worked around this by clearing the `translations` table, that is no
+longer necessary.
+
+## Deprecations
+
+### `Translation::getTranslation()`'s `$group` argument
+
+```php
+// deprecated, will be removed in 3.0
+$translation->getTranslation($locale, '*');
+
+// supported
+$translation->getTranslation($locale);
+```
+
+Passing `$group` falls back to the fallback locale and then to the key. That is a display convenience
+and must never be used while loading translations — it is what caused the shadowing described in §4.
+Nothing in the package passes it any more.
+
+**Action required:** none unless you call it yourself. If you do, and you want a renderable value for a
+row that may be untranslated, resolve the fallback in your own code; the model will stop doing it in 3.0.
