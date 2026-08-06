@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Brackets\AdminTranslations\Models;
 
 use Brackets\AdminTranslations\Observers\TranslationObserver;
+use Brackets\AdminTranslations\Service\LocaleProvider;
 use Carbon\CarbonInterface;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
@@ -42,7 +44,7 @@ class Translation extends Model
         if ($namespace === '' || $namespace === null) {
             $namespace = '*';
         }
-        $cache = app(Cache::class);
+        $cache = Container::getInstance()->make(Cache::class);
 
         return $cache->rememberForever(
             static::getCacheKey($namespace, $group, $locale),
@@ -74,7 +76,7 @@ class Translation extends Model
     public function getTranslation(string $locale, ?string $group = null): string
     {
         if ($group === '*' && !isset($this->text[$locale])) {
-            $config = app(Config::class);
+            $config = Container::getInstance()->make(Config::class);
             assert($config instanceof Config);
             $fallback = $config->get('app.fallback_locale');
 
@@ -92,14 +94,23 @@ class Translation extends Model
     }
 
     /**
-     * Flush cache
+     * Flush the cached translations of this row's group, for every configured locale.
+     *
+     * Not only the locales already present in `text`: a row saved with no text at all has
+     * none, so keying the flush on them meant a scanned row never invalidated anything and
+     * `rememberForever` kept serving the previous contents of the group.
      */
     public function flushGroupCache(): void
     {
-        $cache = app(Cache::class);
+        $cache = Container::getInstance()->make(Cache::class);
         assert($cache instanceof Cache);
 
-        foreach ($this->getTranslatedLocales() as $locale) {
+        $localeProvider = Container::getInstance()->make(LocaleProvider::class);
+        assert($localeProvider instanceof LocaleProvider);
+
+        $locales = array_unique([...$localeProvider->all(), ...$this->getTranslatedLocales()]);
+
+        foreach ($locales as $locale) {
             $cache->forget(static::getCacheKey($this->namespace ?? '*', $this->group, $locale));
         }
     }

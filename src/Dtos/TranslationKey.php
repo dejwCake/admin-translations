@@ -16,4 +16,9 @@ final readonly class TranslationKey
     {
         return sprintf('%s|%s|%s', $this->namespace, $this->group, $this->key);
     }
+
+    public function getGroup(): TranslationGroup
+    {
+        return new TranslationGroup($this->namespace, $this->group);
+    }
 }

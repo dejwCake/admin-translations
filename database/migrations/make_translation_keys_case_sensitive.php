@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Container\Container;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Migrations\Migration;
 
@@ -18,7 +19,7 @@ return new class extends Migration
 
     public function __construct()
     {
-        $this->db = app()->make(DatabaseManager::class);
+        $this->db = Container::getInstance()->make(DatabaseManager::class);
     }
 
     public function up(): void

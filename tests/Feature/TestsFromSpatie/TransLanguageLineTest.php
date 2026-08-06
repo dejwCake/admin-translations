@@ -24,7 +24,7 @@ class TransLanguageLineTest extends TestCase
 
     public function testItCanGetTranslationsForLanguageFilesForTheCurrentLocale(): void
     {
-        app()->setLocale('nl');
+        $this->app->setLocale('nl');
 
         self::assertEquals('nl value', trans('file.key'));
         self::assertEquals('pagina niet gevonden', trans('file.404.title'));

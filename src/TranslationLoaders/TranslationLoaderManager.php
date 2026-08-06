@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Brackets\AdminTranslations\TranslationLoaders;
 
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
@@ -40,7 +41,7 @@ final class TranslationLoaderManager extends FileLoader
     private function getTranslationsForTranslationLoaders(string $locale, string $group, string $namespace): array
     {
         return (new Collection($this->config->get('admin-translations.translation_loaders')))
-            ->map(static fn (string $className) => app($className))
+            ->map(static fn (string $className) => Container::getInstance()->make($className))
             ->mapWithKeys(
                 static fn (TranslationLoader $translationLoader) => $translationLoader->loadTranslations(
                     $locale,

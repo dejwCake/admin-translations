@@ -22,14 +22,14 @@ class DbLanguageLineTest extends TestCase
 
     public function testItCanGetACorrectTranslationAfterTheLocaleHasBeenChanged(): void
     {
-        app()->setLocale('nl');
+        $this->app->setLocale('nl');
 
         self::assertEquals('nederlands', trans('group.key'));
     }
 
     public function testItCanReturnTheGroupAndTheKeyWhenGettingANonExistingTranslation(): void
     {
-        app()->setLocale('nl');
+        $this->app->setLocale('nl');
 
         self::assertEquals('group.unknown', trans('group.unknown'));
     }

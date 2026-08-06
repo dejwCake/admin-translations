@@ -44,6 +44,40 @@ final readonly class TranslationRepository
         }
     }
 
+    /**
+     * Fill an existing row's text from the values a translation currently has in the lang
+     * files.
+     *
+     * Without `$overwrite` only locales that are empty are filled, so anything edited in the
+     * admin UI survives. With it, every locale the files supply replaces what is stored.
+     *
+     * @param array<string, string> $text
+     */
+    public function fillText(string $namespace, string $group, string $key, array $text, bool $overwrite = false): void
+    {
+        $translation = $this->findExact($namespace, $group, $key);
+
+        if ($translation === null) {
+            return;
+        }
+
+        $current = $translation->text;
+        $merged = $current;
+
+        foreach ($text as $locale => $value) {
+            if ($overwrite || ($current[$locale] ?? '') === '') {
+                $merged[$locale] = $value;
+            }
+        }
+
+        if ($merged === $current) {
+            return;
+        }
+
+        $translation->text = $merged;
+        $translation->save();
+    }
+
     public function getUsedGroups(): Collection
     {
         return Translation::whereNull('deleted_at')
