@@ -62,11 +62,33 @@ final readonly class LangFileKeyCollector
                     continue;
                 }
 
-                foreach (array_keys(Arr::dot((array) $this->disk->getRequire($file))) as $key) {
-                    $translationKey = new TranslationKey($directory->namespace, $group, (string) $key);
-                    $keys->put($translationKey->getIdentifier(), $translationKey);
-                }
+                $keys = $keys->merge($this->fileKeys($directory->namespace, $group, $file));
             }
+        }
+
+        return $keys;
+    }
+
+    /**
+     * The keys one lang file declares, flattened.
+     *
+     * @return Collection<string, TranslationKey>
+     */
+    private function fileKeys(string $namespace, string $group, string $file): Collection
+    {
+        $keys = new Collection();
+
+        foreach (Arr::dot((array) $this->disk->getRequire($file)) as $key => $value) {
+            // `Arr::dot` cannot descend into an empty array, so it keeps it as a leaf.
+            // `validation.attributes` is the usual case: a container declared `[]`, never a
+            // translation, and one the translator reports as a string rather than an array, so
+            // the repository's array guard cannot reject it either.
+            if (is_array($value)) {
+                continue;
+            }
+
+            $translationKey = new TranslationKey($namespace, $group, (string) $key);
+            $keys->put($translationKey->getIdentifier(), $translationKey);
         }
 
         return $keys;

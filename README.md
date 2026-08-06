@@ -27,6 +27,27 @@ published frontend consumes. `imported_groups` defaults to `['*']` — every gro
 `translatable.locales`. Name groups explicitly (`'validation'`, `'brackets/admin-ui::admin'`) to
 narrow it, or set an empty array to import nothing.
 
+### Keeping test files out
+
+`scanned_extensions` covers `.vue`, `.ts` and friends, which means **a test that exercises the
+translation helper looks exactly like real source to the scanner**. A line such as
+`expect(__('greet', { name: 'Sam' })).toBe('Hi Sam')` contributes `greet` as a translation key, and
+nothing in the call itself says otherwise.
+
+Use `excluded_paths` — glob patterns matched against the whole file path, applied before the file is
+read:
+
+```php
+'excluded_paths' => [
+    '*tests*',
+    '*node_modules*',
+    '*.test.ts',
+    '*.spec.ts',
+],
+```
+
+It is empty by default, so nothing that is scanned today stops being scanned on upgrade.
+
 ### Storing the translations too
 
 By default the command stores **keys only** — the text stays in the lang files, and the loader

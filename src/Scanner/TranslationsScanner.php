@@ -217,6 +217,10 @@ final class TranslationsScanner
      */
     private function isScannable(SplFileInfo $file): bool
     {
+        if ($this->isExcluded($file)) {
+            return false;
+        }
+
         $extensions = (array) ($this->config?->get('admin-translations.scanned_extensions', []) ?? []);
 
         if ($extensions === []) {
@@ -224,5 +228,30 @@ final class TranslationsScanner
         }
 
         return in_array(mb_strtolower($file->getExtension()), $extensions, true);
+    }
+
+    /**
+     * Whether a file sits under one of the configured excluded paths.
+     *
+     * Checked before the extension filter, and before the file is read: an excluded file costs
+     * a `fnmatch` and nothing else.
+     */
+    private function isExcluded(SplFileInfo $file): bool
+    {
+        $patterns = (array) ($this->config?->get('admin-translations.excluded_paths', []) ?? []);
+
+        if ($patterns === []) {
+            return false;
+        }
+
+        $path = $file->getPathname();
+
+        foreach ($patterns as $pattern) {
+            if (fnmatch((string) $pattern, $path)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

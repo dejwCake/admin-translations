@@ -75,4 +75,17 @@ return [
         'ts',
         'tsx',
     ],
+
+    /*
+     * Paths that are never scanned, as glob patterns matched against the whole file path.
+     *
+     * Test files are why this exists: a test that exercises the translation helper is full of
+     * `__('greet')` calls that are assertion inputs, not strings any user sees, and the scanner
+     * cannot tell them apart from real ones. Excluded files are skipped before being read.
+     *
+     * Empty by default so nothing that is scanned today stops being scanned. A typical value:
+     *
+     *     'excluded_paths' => ['*tests*', '*node_modules*', '*.test.ts', '*.spec.ts'],
+     */
+    'excluded_paths' => [],
 ];
