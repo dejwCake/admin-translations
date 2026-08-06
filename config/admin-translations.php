@@ -39,6 +39,27 @@ return [
     ],
 
     /*
+     * Groups whose keys are taken from the local lang files rather than from scanning.
+     *
+     * Laravel assembles `validation.*` and `passwords.*` at runtime, and a package may
+     * declare keys that only its published frontend consumes, so no scan can reach either.
+     *
+     * '*' imports every group found under lang/{locale} and lang/vendor/{namespace}/{locale},
+     * for the locales in `translatable.locales`. Name groups explicitly ('validation', or
+     * 'brackets/admin-ui::admin') to narrow it, or use an empty array to import nothing.
+     */
+    'imported_groups' => ['*'],
+
+    /*
+     * Whether lang/{locale}.json is imported as well, for the same locales.
+     *
+     * Its keys are string-keyed translations, stored under the `*` namespace and `*` group
+     * exactly as `__('Some text')` is, so anything already spelled out in code is deduplicated
+     * rather than stored twice. Turn it off to keep the JSON dictionaries out of the database.
+     */
+    'imported_json' => true,
+
+    /*
      * Only files with these extensions are scanned. Everything else in a scanned
      * directory is skipped without being read, which keeps snapshots, images and other
      * build artefacts out of the way.

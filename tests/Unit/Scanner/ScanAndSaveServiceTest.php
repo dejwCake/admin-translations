@@ -7,6 +7,7 @@ namespace Brackets\AdminTranslations\Tests\Unit\Scanner;
 use Brackets\AdminTranslations\Models\Translation;
 use Brackets\AdminTranslations\Scanner\ScanAndSaveService;
 use Brackets\AdminTranslations\Tests\TestCase;
+use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Support\Collection;
 
 class ScanAndSaveServiceTest extends TestCase
@@ -33,8 +34,10 @@ class ScanAndSaveServiceTest extends TestCase
         // From fooA.blade.php:
         // trans(): good.key1, good.key2, good.key6 with a space, admin::auth.key7, brackets/admin-ui::auth.key8 = 5
         // __(): Good key 3, Good 'key' 4, " ", "  ", Good "key" 5, Good. Key.,
-        // File, Good, <strong>Good</strong>, Good (better) = 10
-        self::assertSame(19, $count);
+        // File, Good, <strong>Good</strong>, Good (better), and the four escaped-quote ones = 14
+        // Imported from lang/en/file.php: key, 404.title, 404.message = 3
+        // Imported from lang/{en,sk}.json: Services, Contact us = 2
+        self::assertSame(24, $count);
     }
 
     public function testScanAndSaveCreatesTranslationRecords(): void
@@ -130,10 +133,85 @@ class ScanAndSaveServiceTest extends TestCase
 
     public function testScanAndSaveWithEmptyPathsReturnsZero(): void
     {
+        // Importing is independent of scanning, so it has to be off for "nothing scanned"
+        // to mean "nothing saved"
+        $config = $this->app->make(Config::class);
+        $config->set('admin-translations.imported_groups', []);
+        $config->set('admin-translations.imported_json', false);
+
         $count = $this->scanAndSaveService->scanAndSave(new Collection());
 
         self::assertSame(0, $count);
         self::assertSame(0, Translation::count());
+    }
+
+    public function testScanAndSaveImportsDeclaredKeysWithoutScanningAnything(): void
+    {
+        $count = $this->scanAndSaveService->scanAndSave(new Collection());
+
+        // lang/en/file.php flattened (3) plus lang/{en,sk}.json (2)
+        self::assertSame(5, $count);
+        self::assertNotNull(
+            Translation::where('namespace', '*')->where('group', 'file')->where('key', '404.title')->first(),
+        );
+    }
+
+    public function testImportedGroupsCanBeNarrowedToSpecificGroups(): void
+    {
+        $config = $this->app->make(Config::class);
+        $config->set('admin-translations.imported_groups', ['nope']);
+        $config->set('admin-translations.imported_json', false);
+
+        self::assertSame(0, $this->scanAndSaveService->scanAndSave(new Collection()));
+    }
+
+    public function testJsonDictionariesAreImportedUnderTheStarGroup(): void
+    {
+        $this->scanAndSaveService->scanAndSave(new Collection());
+
+        self::assertNotNull(
+            Translation::where('namespace', '*')->where('group', '*')->where('key', 'Services')->first(),
+        );
+    }
+
+    public function testJsonDictionariesCanBeExcluded(): void
+    {
+        $this->app->make(Config::class)->set('admin-translations.imported_json', false);
+
+        $this->scanAndSaveService->scanAndSave(new Collection());
+
+        self::assertNull(
+            Translation::where('namespace', '*')->where('group', '*')->where('key', 'Services')->first(),
+        );
+    }
+
+    public function testJsonImportSkipsLocalesThatAreNotConfigured(): void
+    {
+        // tests/fixtures/lang/nl.json exists, but `nl` is not in translatable.locales
+        $this->scanAndSaveService->scanAndSave(new Collection());
+
+        self::assertNull(
+            Translation::where('namespace', '*')->where('group', '*')->where('key', 'Dutch only')->first(),
+        );
+    }
+
+    public function testImportSkipsLocalesThatAreNotConfigured(): void
+    {
+        // tests/fixtures/lang/nl/file.php exists, but `nl` is not in translatable.locales
+        $this->scanAndSaveService->scanAndSave(new Collection());
+
+        self::assertSame(5, Translation::count());
+    }
+
+    public function testAKeyFoundByBothTheScanAndTheImportIsStoredOnce(): void
+    {
+        $count = $this->scanAndSaveService->scanAndSave(new Collection([$this->getFixturesDirectory('lang-and-code')]));
+
+        self::assertSame(
+            1,
+            Translation::where('namespace', '*')->where('group', 'file')->where('key', 'key')->count(),
+        );
+        self::assertSame($count, Translation::count());
     }
 
     public function testScanAndSaveWithEmptyPathsSoftDeletesExistingTranslations(): void

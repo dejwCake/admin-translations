@@ -6,6 +6,7 @@ namespace Brackets\AdminTranslations\Tests\Feature\Console\Commands;
 
 use Brackets\AdminTranslations\Models\Translation;
 use Brackets\AdminTranslations\Tests\TestCase;
+use Illuminate\Contracts\Config\Repository as Config;
 
 class ScanAndSaveTest extends TestCase
 {
@@ -14,7 +15,7 @@ class ScanAndSaveTest extends TestCase
         // Config sets scanned_directories to tests/fixtures/views in TestCase::getEnvironmentSetUp
         $this->artisan('admin-translations:scan-and-save')
             ->assertSuccessful()
-            ->expectsOutputToContain('19 translations saved');
+            ->expectsOutputToContain('24 translations saved');
 
         self::assertGreaterThan(0, Translation::count());
     }
@@ -25,14 +26,26 @@ class ScanAndSaveTest extends TestCase
 
         $this->artisan('admin-translations:scan-and-save', ['paths' => [$viewsDir]])
             ->assertSuccessful()
-            ->expectsOutputToContain('19 translations saved');
+            ->expectsOutputToContain('24 translations saved');
     }
 
-    public function testWithEmptyDirectorySavesZeroTranslations(): void
+    public function testWithEmptyDirectorySavesOnlyTheImportedKeys(): void
     {
         $emptyDir = $this->getFixturesDirectory('lang');
 
+        // Nothing to scan there, so the count is whatever the lang files declare
         $this->artisan('admin-translations:scan-and-save', ['paths' => [$emptyDir]])
+            ->assertSuccessful()
+            ->expectsOutputToContain('5 translations saved');
+    }
+
+    public function testWithNothingToScanOrImportSavesZeroTranslations(): void
+    {
+        $config = $this->app->make(Config::class);
+        $config->set('admin-translations.imported_groups', []);
+        $config->set('admin-translations.imported_json', false);
+
+        $this->artisan('admin-translations:scan-and-save', ['paths' => [$this->getFixturesDirectory('lang')]])
             ->assertSuccessful()
             ->expectsOutputToContain('0 translations saved');
     }
