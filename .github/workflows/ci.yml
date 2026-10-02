@@ -93,7 +93,7 @@ jobs:
           --health-timeout=5s
           --health-retries=5
       mysql:
-        image: dejwcake/mariadb12.2:1
+        image: dejwcake/mariadb12.3:1
         env:
           MYSQL_DATABASE: laravel
           MYSQL_USER: laravel
