@@ -25,6 +25,12 @@ parameters:
         - ./tests
 
     ignoreErrors:
+        -
+            # The admin_users auth provider falls back to the consumer's App\Models\User
+            # (config/auth.providers.admin_users.php), which does not exist inside the package.
+            identifier: class.notFound
+            message: '#App\\Models\\User#'
+            path: src/Http/Controllers/Admin/TranslationsController.php
 
     excludePaths:
         - ./tests/fixtures/*
