@@ -52,10 +52,11 @@ final readonly class LangFileKeyCollector
             return new Collection();
         }
 
+        /** @var Collection<string, TranslationKey> $keys */
         $keys = new Collection();
 
         foreach ($this->langDirectories() as $directory) {
-            foreach ($this->disk->glob($directory->path . '/*.php') as $file) {
+            foreach ($this->disk->glob(sprintf('%s/*.php', $directory->path)) as $file) {
                 $group = pathinfo($file, PATHINFO_FILENAME);
 
                 if (!$this->isImported($groups, $directory->namespace, $group)) {
@@ -139,13 +140,13 @@ final readonly class LangFileKeyCollector
         $found = [];
 
         foreach ($this->translatable->getLocales() as $locale) {
-            $ownDirectory = $langPath . '/' . $locale;
+            $ownDirectory = sprintf('%s/%s', $langPath, $locale);
 
             if ($this->disk->isDirectory($ownDirectory)) {
                 $found[] = new LangDirectory('*', $ownDirectory);
             }
 
-            $vendorPath = $langPath . '/vendor';
+            $vendorPath = sprintf('%s/vendor', $langPath);
 
             if (!$this->disk->isDirectory($vendorPath)) {
                 continue;
@@ -166,20 +167,24 @@ final readonly class LangFileKeyCollector
     {
         $namespace = basename($vendorDirectory);
 
-        if ($this->disk->isDirectory($vendorDirectory . '/' . $locale)) {
-            return [new LangDirectory($namespace, $vendorDirectory . '/' . $locale)];
+        $localeDirectory = sprintf('%s/%s', $vendorDirectory, $locale);
+
+        if ($this->disk->isDirectory($localeDirectory)) {
+            return [new LangDirectory($namespace, $localeDirectory)];
         }
 
         $found = [];
 
         foreach ($this->disk->directories($vendorDirectory) as $packageDirectory) {
-            if (!$this->disk->isDirectory($packageDirectory . '/' . $locale)) {
+            $packageLocaleDirectory = sprintf('%s/%s', $packageDirectory, $locale);
+
+            if (!$this->disk->isDirectory($packageLocaleDirectory)) {
                 continue;
             }
 
             $found[] = new LangDirectory(
-                $namespace . '/' . basename($packageDirectory),
-                $packageDirectory . '/' . $locale,
+                sprintf('%s/%s', $namespace, basename($packageDirectory)),
+                $packageLocaleDirectory,
             );
         }
 
@@ -201,6 +206,6 @@ final readonly class LangFileKeyCollector
         }
 
         return in_array($group, $groups, true)
-            || in_array($namespace . '::' . $group, $groups, true);
+            || in_array(sprintf('%s::%s', $namespace, $group), $groups, true);
     }
 }
