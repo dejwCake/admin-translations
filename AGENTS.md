@@ -32,7 +32,7 @@ docker compose run --rm -e DB_CONNECTION=pgsql test ./vendor/bin/phpunit   # Pos
 docker compose run --rm php-qa phpcs -s --colors --extensions=php
 docker compose run --rm php-qa phpcbf -s --colors --extensions=php       # auto-fix style
 docker compose run --rm php-qa phpstan analyse --configuration=phpstan.neon
-docker compose run --rm php-qa phpmd ./config,./database,./lang,./resources,./routes,./src,./tests ansi phpmd.xml --suffixes php --baseline-file phpmd.baseline.xml
+docker compose run --rm php-qa phpmd analyze
 docker compose run --rm php-qa phpcs --standard=.phpcs.compatibility.xml --cache=.phpcs.cache
 docker compose run --rm php-qa composer normalize
 ```

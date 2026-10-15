@@ -160,9 +160,19 @@ Static analysis (phpstan):
 docker compose run -it --rm php-qa phpstan analyse --configuration=phpstan.neon
 ```
 
+Regenerate the phpstan baseline:
+```shell
+docker compose run -it --rm php-qa phpstan analyse --configuration=phpstan.neon --generate-baseline=phpstan-baseline.neon
+```
+
 Mess detector (phpmd):
 ```shell
-docker compose run -it --rm php-qa phpmd ./config,./database,./lang,./resources,./routes,./src,./tests ansi phpmd.xml --suffixes php --baseline-file phpmd.baseline.xml
+docker compose run -it --rm php-qa phpmd analyze
+```
+
+Regenerate the phpmd baseline:
+```shell
+docker compose run -it --rm php-qa phpmd analyze --generate-baseline
 ```
 
 ### Run tests
@@ -191,7 +201,7 @@ docker compose run -it --rm test composer update \
   && docker compose run -it --rm php-qa phpcs --standard=.phpcs.compatibility.xml --cache=.phpcs.cache \
   && docker compose run -it --rm php-qa phpcs -s --colors --extensions=php \
   && docker compose run -it --rm php-qa phpstan analyse --configuration=phpstan.neon \
-  && docker compose run -it --rm php-qa phpmd ./config,./database,./lang,./resources,./routes,./src,./tests ansi phpmd.xml --suffixes php --baseline-file phpmd.baseline.xml \
+  && docker compose run -it --rm php-qa phpmd analyze \
   && docker compose run -it --rm -e DB_CONNECTION=mysql test ./vendor/bin/phpunit \
   && docker compose run -it --rm -e DB_CONNECTION=pgsql test ./vendor/bin/phpunit
 ```
