@@ -93,7 +93,7 @@ abstract class TestCase extends Orchestra
 
         match (Env::get('DB_CONNECTION')) {
             'pgsql' => $this->configurePgsql($app),
-            'mysql' => $this->configureMysql($app),
+            'mariadb' => $this->configureMariadb($app),
             default => $this->configureSqlite($app),
         };
 
@@ -132,12 +132,12 @@ abstract class TestCase extends Orchestra
         ]);
     }
 
-    private function configureMysql(mixed $app): void
+    private function configureMariadb(mixed $app): void
     {
-        $app['config']->set('database.default', 'mysql');
-        $app['config']->set('database.connections.mysql', [
-            'driver' => 'mysql',
-            'host' => 'mysql',
+        $app['config']->set('database.default', 'mariadb');
+        $app['config']->set('database.connections.mariadb', [
+            'driver' => 'mariadb',
+            'host' => 'mariadb',
             'port' => '3306',
             'database' => Env::get('DB_DATABASE', 'laravel'),
             'username' => Env::get('DB_USERNAME', 'root'),

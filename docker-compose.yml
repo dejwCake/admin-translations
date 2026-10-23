@@ -2,7 +2,7 @@ services:
   test:
     image: dejwcake/php8.5:1
     environment:
-      DB_CONNECTION: "${DB_CONNECTION:-mysql}"
+      DB_CONNECTION: "${DB_CONNECTION:-mariadb}"
       DB_DATABASE: "${DB_DATABASE:-laravel}"
       DB_USERNAME: "${DB_USERNAME:-laravel}"
       DB_PASSWORD: "${DB_PASSWORD:-bestsecret}"
@@ -11,7 +11,7 @@ services:
     depends_on:
       pgsql:
         condition: service_healthy
-      mysql:
+      mariadb:
         condition: service_healthy
 
   pgsql:
@@ -30,7 +30,7 @@ services:
       retries: 10
       start_period: 30s
 
-  mysql:
+  mariadb:
     image: dejwcake/mariadb12.3:1
     environment:
       MYSQL_DATABASE: "${DB_DATABASE:-laravel}"

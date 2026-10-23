@@ -57,8 +57,8 @@ class MakeTranslationKeysCaseSensitiveTest extends TestCase
 
     public function testDriversThatAlreadyCompareExactlyAreLeftAlone(): void
     {
-        if ($this->connection()->getDriverName() === 'mysql') {
-            self::markTestSkipped('MySQL is covered by the other cases in this class');
+        if ($this->isMysqlFamily()) {
+            self::markTestSkipped('MySQL/MariaDB is covered by the other cases in this class');
         }
 
         // Must not emit MySQL-only DDL, and the comparison was already exact
@@ -74,9 +74,14 @@ class MakeTranslationKeysCaseSensitiveTest extends TestCase
 
     private function skipUnlessMysql(): void
     {
-        if ($this->connection()->getDriverName() !== 'mysql') {
+        if (!$this->isMysqlFamily()) {
             self::markTestSkipped('Collation is a MySQL/MariaDB concern');
         }
+    }
+
+    private function isMysqlFamily(): bool
+    {
+        return in_array($this->connection()->getDriverName(), ['mysql', 'mariadb'], true);
     }
 
     private function runMigration(string $direction): void
